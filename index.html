@@ -32,6 +32,11 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .score{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:stretch;border-radius:14px;overflow:hidden;font-family:var(--display)}
 .score .t{display:flex;align-items:center;gap:10px;padding:6px 14px;color:#fff;font-size:15px;letter-spacing:.04em}
 .score .t.b{background:var(--blue)} .score .t.o{background:var(--orange);flex-direction:row-reverse}
+.score .t em{font-style:normal}
+.score.progmode .t.b{background:var(--green)}
+.score .t,.score .clock{transition:background .4s}
+.score span.bump{animation:bump .7s cubic-bezier(.3,1.6,.4,1)}
+@keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.6)}100%{transform:scale(1)}}
 .score .t span{font-size:30px;line-height:1;min-width:22px;text-align:center}
 .score .clock{background:var(--paper);color:var(--ink);padding:6px 14px;display:grid;place-items:center;font-size:20px;min-width:84px;font-variant-numeric:tabular-nums}
 .menu{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:520px}
@@ -270,9 +275,9 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
     <div><b>NITRO</b><small>ARENA · ESIEE-IT</small></div>
   </div>
   <div class="score shadow" aria-label="Score">
-    <div class="t b">BLEU <span id="sB">0</span></div>
+    <div class="t b"><em id="lB">BLEU</em> <span id="sB">0</span></div>
     <div class="clock" id="clock">3:00</div>
-    <div class="t o">ORANGE <span id="sO">0</span></div>
+    <div class="t o"><em id="lO">ORANGE</em> <span id="sO">0</span></div>
   </div>
   <nav class="menu" aria-label="Ouvrir une section">
     <button class="chip shadow" data-open="projet" style="--c:var(--ink)"><i></i><span class="lbl">Projet</span></button>
@@ -631,6 +636,16 @@ function build(){
 
 const QR=["000000000000000000000000000000000", "000000000000000000000000000000000", "001111111001000100101110111111100", "001000001001010111010000100000100", "001011101010111010000110101110100", "001011101010001101110100101110100", "001011101011100100111100101110100", "001000001011001111001010100000100", "001111111010101010101010111111100", "000000000011100011100000000000000", "001011111001010001110100111110000", "000001000100001100100110111000100", "001110101101000111100000010000000", "000011010111011101001010010101000", "001110111110101010010000000110000", "001010110100011000111111111000100", "000010001001110001001011001110000", "001011100111001010101010011001000", "001101011111100000010100000110000", "001101100011001110100111111010100", "001001011001001111100011111010000", "001010110100110100100000011001000", "001011001001001010010011111011100", "000000000011100000001010001111100", "001111111000101001111110101110000", "001000001010000010101110001001100", "001011101010101000011011111010000", "001011101011011010111000000111100", "001011101011001001110010111111000", "001000001000111011001011011101000", "001111111011111000010100110010000", "000000000000000000000000000000000", "000000000000000000000000000000000"],SITE_URL='https://medouaishamdi.github.io/nitro/';
 function drawQR(g,x,y,S){const n=QR.length,c=S/n;g.fillStyle='#fff';g.fillRect(x,y,S,S);g.fillStyle='#10213b';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(QR[r][k]==='1')g.fillRect(Math.floor(x+k*c),Math.floor(y+r*c),Math.ceil(c),Math.ceil(c));}
+/* scoreboard: match score while playing, project progress otherwise (live with the task list) */
+function progCount(){const live=(typeof DATA!=='undefined'?DATA:{tasks:[]}).tasks.filter(t=>t.status!=='dropped'),d=live.filter(t=>t.status==='done').length;return {d,r:live.length-d,p:live.length?Math.round(d/live.length*100):0};}
+let lastSc='';
+function setTxt(id,v){const el=$(id);v=String(v);if(el.textContent!==v){const bump=(id==='sB'||id==='sO')&&el.textContent!=='';el.textContent=v;if(bump){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');}}}
+function updScore(){
+  const play=G.mode==='play';$('clock').parentElement.classList.toggle('progmode',!play);
+  if(play){setTxt('lB','BLEU');setTxt('lO','ORANGE');setTxt('sB',G.score.b);setTxt('sO',G.score.o);const m=Math.floor(G.clock/60),s=Math.floor(G.clock%60);setTxt('clock',`${m}:${String(s).padStart(2,'0')}`);}
+  else{const c=progCount();setTxt('lB','FAIT');setTxt('lO','À FAIRE');setTxt('sB',c.d);setTxt('sO',c.r);setTxt('clock',c.p+' %');}
+  const key=play+'|'+G.score.b+G.score.o+'|'+progCount().d;if(key!==lastSc){lastSc=key;if(jMode==='team')drawJumbo('team');}
+}
 function drawJumbo(kind,data){
   if(!jumboCtx)return;const g=jumboCtx,w=1024,h=400;
   const bg=g.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#10213b');bg.addColorStop(1,'#1a3a6b');g.fillStyle=bg;g.fillRect(0,0,w,h);
@@ -644,7 +659,7 @@ function drawJumbo(kind,data){
     g.fillStyle='#ffcc29';g.font='30px "Russo One", Impact, sans-serif';g.fillText('NITRO ARENA · L\'ÉQUIPE',w/2,52);
     const names=[['AYMEN','ELLILI','#1f7cff'],['MOHAMED OUAIS','HAMDI','#ff7a1a'],['EYA','MOALLA','#22b45a'],['OUSSAMA','TAIEB','#f0384b']];
     names.forEach(([a,b,c],i)=>{const x=w*(i+.5)/4;g.fillStyle=c;g.beginPath();g.arc(x,165,58,0,7);g.fill();g.fillStyle='#fff';g.font='48px "Russo One", Impact, sans-serif';g.fillText(a[0]+b[0],x,168);g.font='22px "Russo One", Impact, sans-serif';g.fillText(a,x,262);g.font='30px "Russo One", Impact, sans-serif';g.fillText(b,x,296);});
-    g.fillStyle='rgba(255,255,255,.7)';g.font='24px "Russo One", Impact, sans-serif';g.fillText(`BLEU ${G.score.b}  ·  ORANGE ${G.score.o}`,w/2,362);
+    g.fillStyle='rgba(255,255,255,.7)';g.font='24px "Russo One", Impact, sans-serif';g.fillText(G.mode==='play'?`BLEU ${G.score.b}  ·  ORANGE ${G.score.o}`:`AVANCEMENT : ${progCount().d} FAITES  ·  ${progCount().r} À FAIRE`,w/2,362);
   }
   jumboTex.needsUpdate=true;
 }
@@ -706,7 +721,6 @@ function scoreGoal(side){
   if(G.goalLock)return;G.goalLock=true;
   const done=side==='o';
   if(done)G.score.b++;else G.score.o++;
-  $('sB').textContent=G.score.b;$('sO').textContent=G.score.o;
   const col=done?'var(--orange)':'var(--blue)';
   centerMsg(`BUT !<small>${done?'Voici ce qui est déjà fait':'Contre son camp : voici ce qu\'il reste à faire'}</small>`,'goal',1900);
   $('center').firstChild.style.setProperty('--gc',done?'#ff7a1a':'#1f7cff');
@@ -785,7 +799,7 @@ function step(now){
     else if(Math.hypot(car.x-b.x,car.z-b.z)<2.2&&G.mode==='play'){b.ready=false;b.t=5;b.orb.visible=false;G.boost=Math.min(100,G.boost+40);sfx.boostPad();}}
   // clock
   if(G.mode==='play'&&!G.frozen&&!sheetOpen&&!G.goalLock&&G.clock>0){G.clock-=dt;if(G.clock<=0){G.clock=0;endMatch();}}
-  const m=Math.floor(G.clock/60),s=Math.floor(G.clock%60);$('clock').textContent=`${m}:${String(s).padStart(2,'0')}`;
+  updScore();
   // render state
   if(THREE_OK){
     carG.position.set(car.x,0,car.z);carG.rotation.y=car.h;
@@ -1005,7 +1019,7 @@ canvas.addEventListener('click',e=>{if(!THREE_OK||!jumbo)return;const r=canvas.g
 function endMatch(){
   G.frozen=true;const res=G.score.b>G.score.o?'Victoire bleue !':G.score.b<G.score.o?'Victoire orange !':'Match nul';sfx.whistle();
   const d=document.createElement('div');d.className='end';d.innerHTML=`<div class="intro-card shadow" style="max-width:440px;text-align:center"><div class="logo" style="justify-content:center"><h1 style="font-size:44px">${res}</h1></div><p class="sub">BLEU ${G.score.b} · ${G.score.o} ORANGE</p><div class="cta" style="justify-content:center;margin-top:18px"><button class="btn">Rejouer</button></div></div>`;
-  d.querySelector('button').onclick=()=>{d.remove();G.score={b:0,o:0};$('sB').textContent=0;$('sO').textContent=0;G.clock=180;G.boost=33;kickoff();};document.body.append(d);
+  d.querySelector('button').onclick=()=>{d.remove();G.score={b:0,o:0};G.clock=180;G.boost=33;kickoff();};document.body.append(d);
 }
 function resize(){if(!THREE_OK)return;const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
 if(THREE_OK){build();resize();addEventListener('resize',resize);ball.vx=8;ball.vz=5;requestAnimationFrame(step);}
