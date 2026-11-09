@@ -139,6 +139,8 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .task.dropped p{text-decoration:line-through;color:var(--muted)}
 .st{flex:none;border-radius:999px;padding:5px 10px;font-size:11.5px;font-weight:900;background:var(--c);color:#fff}
 .st:disabled,.who:disabled{cursor:default}
+select.st{appearance:none;-webkit-appearance:none;border:0;cursor:pointer;font-family:inherit;padding:5px 22px 5px 10px;background:var(--c) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='white' stroke-width='1.8' fill='none'/%3E%3C/svg%3E") no-repeat right 8px center}
+select.st option{color:#10213b;background:#fff;font-weight:700}
 .task .tt{cursor:text}
 .ren{width:100%;font:inherit;font-weight:700;border:2px solid var(--blue);border-radius:8px;padding:3px 6px}
 .who{flex:none;width:30px;height:30px;border-radius:9px;background:var(--c);color:#fff;font-family:var(--display);font-size:11px;display:grid;place-items:center}
@@ -830,7 +832,7 @@ function closeSheet(){
 $('closeSheet').onclick=closeSheet;
 document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openSheet(b.dataset.open));
 const TEAM=[['','Personne','#9aa8bb'],['AE','Aymen Ellili','#1f7cff'],['MH','Mohamed Ouais Hamdi','#ff7a1a'],['EM','Eya Moalla','#22b45a'],['OT','Oussama Taieb','#f0384b']];
-const LOCAL_KEY='nitro-tasks-v1';const IN_CLAUDE=!!window.claude;let pendingDel=null;
+const LOCAL_KEY='nitro-tasks-v2';try{localStorage.removeItem('nitro-tasks-v1');}catch(e){}const IN_CLAUDE=!!window.claude;let pendingDel=null;
 function stamp(){DATA.updated=new Date().toISOString().slice(0,10);}
 function changed(){stamp();dirty=true;if(!IN_CLAUDE){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(DATA));}catch(e){}dirty=false;}renderTracker();}
 function celebrate(t){try{if(THREE_OK&&confetti){burst(FX,true);G.cheer=2.5;}sfx.horn();}catch(e){}toast('✅ « '+t.title+' » : but pour l\'équipe !');}
@@ -859,8 +861,9 @@ function renderTracker(){
     const ow=TEAM.find(m=>m[0]===(t.owner||''))||TEAM[0];
     const who=document.createElement('button');who.className='who';who.style.setProperty('--c',ow[2]);who.textContent=ow[0]||'+';who.title=ow[0]?ow[1]+' (cliquer pour changer)':'Qui s\'en occupe ?';who.disabled=readOnly;
     who.onclick=()=>{const i=TEAM.findIndex(m=>m[0]===(t.owner||''));t.owner=TEAM[(i+1)%TEAM.length][0];changed();};
-    const b=document.createElement('button');b.className='st';b.textContent=LABEL[t.status];b.title='Changer le statut';b.disabled=readOnly;
-    b.onclick=()=>{const was=t.status;t.status=t.status==='dropped'?'todo':ORDER[(ORDER.indexOf(t.status)+1)%3];changed();if(t.status==='done'&&was!=='done')celebrate(t);};
+    const b=document.createElement('select');b.className='st';b.title='Changer le statut';b.disabled=readOnly;b.setAttribute('aria-label','Statut de « '+t.title+' »');
+    for(const k of (t.status==='dropped'?['todo','doing','done','dropped']:['todo','doing','done'])){const o=document.createElement('option');o.value=k;o.textContent=LABEL[k];if(k===t.status)o.selected=true;b.append(o);}
+    b.onchange=()=>{const was=t.status;t.status=b.value;changed();if(t.status==='done'&&was!=='done')celebrate(t);};
     el.append(dot,pp,who,b);
     if(!readOnly){const del=document.createElement('button');del.className='del'+(pendingDel===t.id?' arm':'');del.textContent=pendingDel===t.id?'Supprimer ?':'✕';del.title='Supprimer la tâche';
       del.onclick=()=>{if(pendingDel===t.id){DATA.tasks=DATA.tasks.filter(x=>x.id!==t.id);pendingDel=null;changed();}else{pendingDel=t.id;renderTracker();setTimeout(()=>{if(pendingDel===t.id){pendingDel=null;if(sheetKind==='done'||sheetKind==='todo')renderTracker();}},3500);}};el.append(del);}
@@ -875,9 +878,9 @@ function renderTracker(){
     setTimeout(()=>{const n=$('newTask');if(n)n.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')doAdd();};},0);
     const sv=document.createElement('div');sv.className='save';
     if(IN_CLAUDE){const sb=document.createElement('button');sb.className='btn blue';sb.textContent='Enregistrer';sb.style.fontSize='16px';sb.disabled=!dirty;sb.style.opacity=dirty?1:.5;
-      const note=document.createElement('span');note.className='note';note.id='saveNote';note.textContent=dirty?'Modifications non enregistrées.':'Statut : cliquez dessus. Responsable : cliquez sur la pastille. Renommer : double-clic. Puis enregistrez pour toute l\'équipe.';
+      const note=document.createElement('span');note.className='note';note.id='saveNote';note.textContent=dirty?'Modifications non enregistrées.':'Statut : choisissez-le dans la liste. Responsable : cliquez sur la pastille. Renommer : double-clic. Puis enregistrez pour toute l\'équipe.';
       sb.onclick=()=>save(sb,note);sv.append(sb,note);}
-    else{const note=document.createElement('span');note.className='note';note.id='saveNote';note.innerHTML='Enregistré automatiquement <b>sur cet appareil</b>. Statut : cliquez dessus · responsable : la pastille · renommer : double-clic.';
+    else{const note=document.createElement('span');note.className='note';note.id='saveNote';note.innerHTML='Enregistré automatiquement <b>sur cet appareil</b>. Statut : choisissez-le dans la liste · responsable : la pastille · renommer : double-clic.';
       const ex=document.createElement('button');ex.className='btn alt';ex.textContent='Exporter';ex.style.fontSize='14px';ex.style.padding='8px 14px';ex.title='Télécharger tasks.json pour le partager';
       ex.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'}));a.download='tasks.json';document.body.append(a);a.click();a.remove();};
       const rs=document.createElement('button');rs.className='btn alt';rs.textContent='Version de l\'équipe';rs.style.fontSize='14px';rs.style.padding='8px 14px';rs.title='Oublier mes modifications locales';
