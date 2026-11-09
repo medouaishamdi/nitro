@@ -24,13 +24,13 @@ La première carte moteur, une **L298N**, chauffait et perdait de la puissance :
 
 ## Avancement
 
-**Fait (11 / 20 tâches, 55 %)**
-- Voiture : ESP32, hacheur DRV8871 pour le moteur, servomoteur de direction, double alimentation 7,4 V / 5 V, code angle + vitesse, la voiture avance et tourne
+**Fait (12 / 20 tâches, 60 %)**
+- Voiture : ESP32, hacheur DRV8871 pour le moteur, servomoteur de direction, double alimentation 7,4 V / 5 V, code angle + vitesse, la voiture avance, recule et tourne
 - Manette : ESP32 + 2 joysticks, écran DIR | GAZ, conduite progressive à 20 envois/s
 - Liaison directe ESP32 → ESP32 par identifiant unique
 
 **À faire**
-- Marche arrière, LED (clignotants jaunes, feux rouges de recul), klaxon
+- LED (clignotants jaunes, feux rouges de recul), klaxon
 - Coque de la voiture ; finir la coque de la manette (imprimée en 3D, en cours)
 - Base de données (sessions, télémétrie, événements) et calcul de la vitesse
 - Relier le site à la base de données
