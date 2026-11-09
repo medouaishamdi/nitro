@@ -138,6 +138,18 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .task small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
 .task.dropped p{text-decoration:line-through;color:var(--muted)}
 .st{flex:none;border-radius:999px;padding:5px 10px;font-size:11.5px;font-weight:900;background:var(--c);color:#fff}
+.st:disabled,.who:disabled{cursor:default}
+.task .tt{cursor:text}
+.ren{width:100%;font:inherit;font-weight:700;border:2px solid var(--blue);border-radius:8px;padding:3px 6px}
+.who{flex:none;width:30px;height:30px;border-radius:9px;background:var(--c);color:#fff;font-family:var(--display);font-size:11px;display:grid;place-items:center}
+.del{flex:none;border-radius:999px;padding:5px 8px;font-size:11.5px;font-weight:900;color:var(--muted);background:transparent}
+.del:hover{color:var(--red);background:#ffe8eb}
+.del.arm{color:#fff;background:var(--red)}
+.crew{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:-4px 0 12px}
+.crew div{display:flex;align-items:center;gap:6px;background:var(--mist);border-radius:12px;padding:6px 8px;font-size:12.5px}
+.crew b{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.av2{width:24px;height:24px;border-radius:7px;background:var(--c);color:#fff;font-family:var(--display);font-size:10px;display:grid;place-items:center;flex:none}
+.add select{max-width:120px}
 .st:disabled{opacity:.85;cursor:default}
 .add{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .add input,.add select{flex:1 1 180px;min-width:0;border:2px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-weight:700;color:var(--ink);background:#fff}
@@ -817,46 +829,75 @@ function closeSheet(){
 }
 $('closeSheet').onclick=closeSheet;
 document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openSheet(b.dataset.open));
+const TEAM=[['','Personne','#9aa8bb'],['AE','Aymen Ellili','#1f7cff'],['MH','Mohamed Ouais Hamdi','#ff7a1a'],['EM','Eya Moalla','#22b45a'],['OT','Oussama Taieb','#f0384b']];
+const LOCAL_KEY='nitro-tasks-v1';const IN_CLAUDE=!!window.claude;let pendingDel=null;
+function stamp(){DATA.updated=new Date().toISOString().slice(0,10);}
+function changed(){stamp();dirty=true;if(!IN_CLAUDE){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(DATA));}catch(e){}dirty=false;}renderTracker();}
+function celebrate(t){try{if(THREE_OK&&confetti){burst(FX,true);G.cheer=2.5;}sfx.horn();}catch(e){}toast('✅ « '+t.title+' » : but pour l\'équipe !');}
 function renderTracker(){
   const body=$('sheetBody');body.innerHTML='';
   const live=DATA.tasks.filter(t=>t.status!=='dropped'),done=live.filter(t=>t.status==='done').length,p=live.length?Math.round(done/live.length*100):0;
   const prog=document.createElement('div');prog.className='prog';
   prog.innerHTML=`<div class="ring" style="--p:${p}"><b>${p}%</b></div><div style="flex:1;min-width:0"><strong>${done} faites · ${live.length-done} restantes</strong><div class="bar"><i style="width:${p}%"></i></div><span>Mis à jour le ${new Date(DATA.updated+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</span></div>`;
   body.append(prog);
+  // who does what
+  const crew=document.createElement('div');crew.className='crew';
+  crew.innerHTML=TEAM.slice(1).map(([i,n,c])=>{const mine=live.filter(t=>t.owner===i),d=mine.filter(t=>t.status==='done').length;return `<div title="${n}"><span class="av2" style="--c:${c}">${i}</span><b>${d}/${mine.length}</b></div>`;}).join('');
+  body.append(crew);
   const tabs=document.createElement('div');tabs.className='tabs';
   for(const [k,l] of [['done','Fait'],['todo','À faire'],['all','Tout']]){const b=document.createElement('button');b.className='tab'+(trackerView===k?' on':'');b.textContent=l;b.onclick=()=>{trackerView=k;renderTracker();};tabs.append(b);}
   body.append(tabs);
   const list=DATA.tasks.filter(t=>trackerView==='all'||(trackerView==='done'?t.status==='done':t.status!=='done'));
+  if(!list.length){const e=document.createElement('p');e.className='note';e.textContent=trackerView==='done'?'Rien de fait pour l\'instant.':'Plus rien à faire : bravo !';body.append(e);}
   for(const t of list){
     const el=document.createElement('div');el.className='task'+(t.status==='dropped'?' dropped':'');el.style.setProperty('--c',COL[t.status]);
     const dot=document.createElement('span');dot.className='dot';
-    const pp=document.createElement('p');pp.textContent=t.title;const sm=document.createElement('small');sm.textContent=t.part+(t.status==='dropped'?' · idée retirée':'');pp.append(sm);
+    const pp=document.createElement('p');const tt=document.createElement('span');tt.className='tt';tt.textContent=t.title;pp.append(tt);
+    const sm=document.createElement('small');sm.textContent=t.part+(t.status==='dropped'?' · idée retirée':'');pp.append(sm);
+    if(!readOnly){tt.title='Double-clic pour renommer';tt.ondblclick=()=>{const inp=document.createElement('input');inp.className='ren';inp.value=t.title;tt.replaceWith(inp);inp.focus();inp.select();
+      const ok=()=>{const v=inp.value.trim();if(v&&v!==t.title){t.title=v;changed();}else renderTracker();};inp.onkeydown=e=>{if(e.key==='Enter')ok();if(e.key==='Escape')renderTracker();e.stopPropagation();};inp.onblur=ok;};}
+    const ow=TEAM.find(m=>m[0]===(t.owner||''))||TEAM[0];
+    const who=document.createElement('button');who.className='who';who.style.setProperty('--c',ow[2]);who.textContent=ow[0]||'+';who.title=ow[0]?ow[1]+' (cliquer pour changer)':'Qui s\'en occupe ?';who.disabled=readOnly;
+    who.onclick=()=>{const i=TEAM.findIndex(m=>m[0]===(t.owner||''));t.owner=TEAM[(i+1)%TEAM.length][0];changed();};
     const b=document.createElement('button');b.className='st';b.textContent=LABEL[t.status];b.title='Changer le statut';b.disabled=readOnly;
-    b.onclick=()=>{t.status=t.status==='dropped'?'todo':ORDER[(ORDER.indexOf(t.status)+1)%3];dirty=true;renderTracker();};
-    el.append(dot,pp,b);body.append(el);
+    b.onclick=()=>{const was=t.status;t.status=t.status==='dropped'?'todo':ORDER[(ORDER.indexOf(t.status)+1)%3];changed();if(t.status==='done'&&was!=='done')celebrate(t);};
+    el.append(dot,pp,who,b);
+    if(!readOnly){const del=document.createElement('button');del.className='del'+(pendingDel===t.id?' arm':'');del.textContent=pendingDel===t.id?'Supprimer ?':'✕';del.title='Supprimer la tâche';
+      del.onclick=()=>{if(pendingDel===t.id){DATA.tasks=DATA.tasks.filter(x=>x.id!==t.id);pendingDel=null;changed();}else{pendingDel=t.id;renderTracker();setTimeout(()=>{if(pendingDel===t.id){pendingDel=null;if(sheetKind==='done'||sheetKind==='todo')renderTracker();}},3500);}};el.append(del);}
+    body.append(el);
   }
   if(!readOnly){
     const add=document.createElement('div');add.className='add';
-    add.innerHTML='<input id="newTask" placeholder="Nouvelle tâche…" aria-label="Nouvelle tâche"><select id="newPart" aria-label="Partie"><option>Voiture</option><option>Manette</option><option>Liaison</option><option>Web &amp; données</option></select>';
+    add.innerHTML='<input id="newTask" placeholder="Nouvelle tâche…" aria-label="Nouvelle tâche"><select id="newPart" aria-label="Partie"><option>Voiture</option><option>Manette</option><option>Liaison</option><option>Web &amp; données</option></select><select id="newOwner" aria-label="Qui s\'en occupe">'+TEAM.map(([i,n])=>`<option value="${i}">${i?n:'Qui ?'}</option>`).join('')+'</select>';
     const ab=document.createElement('button');ab.className='btn alt';ab.textContent='Ajouter';ab.style.fontSize='15px';ab.style.padding='10px 16px';
-    ab.onclick=()=>{const v=$('newTask').value.trim();if(!v)return;DATA.tasks.push({id:'t'+Date.now().toString(36),part:$('newPart').value,title:v,status:'todo'});dirty=true;trackerView='todo';renderTracker();};
-    add.append(ab);body.append(add);
-    const sv=document.createElement('div');sv.className='save';const sb=document.createElement('button');sb.className='btn blue';sb.textContent='Enregistrer';sb.style.fontSize='16px';sb.disabled=!dirty;sb.style.opacity=dirty?1:.5;
-    const note=document.createElement('span');note.className='note';note.id='saveNote';note.textContent=dirty?'Modifications non enregistrées.':'Cliquez sur un statut pour le changer, puis enregistrez : toute l\'équipe voit la mise à jour.';
-    sb.onclick=()=>save(sb,note);sv.append(sb,note);body.append(sv);
+    const doAdd=()=>{const v=$('newTask').value.trim();if(!v)return;DATA.tasks.push({id:'t'+Date.now().toString(36),part:$('newPart').value,owner:$('newOwner').value,title:v,status:'todo'});trackerView='todo';changed();toast('Tâche ajoutée');};
+    ab.onclick=doAdd;add.append(ab);body.append(add);
+    setTimeout(()=>{const n=$('newTask');if(n)n.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')doAdd();};},0);
+    const sv=document.createElement('div');sv.className='save';
+    if(IN_CLAUDE){const sb=document.createElement('button');sb.className='btn blue';sb.textContent='Enregistrer';sb.style.fontSize='16px';sb.disabled=!dirty;sb.style.opacity=dirty?1:.5;
+      const note=document.createElement('span');note.className='note';note.id='saveNote';note.textContent=dirty?'Modifications non enregistrées.':'Statut : cliquez dessus. Responsable : cliquez sur la pastille. Renommer : double-clic. Puis enregistrez pour toute l\'équipe.';
+      sb.onclick=()=>save(sb,note);sv.append(sb,note);}
+    else{const note=document.createElement('span');note.className='note';note.id='saveNote';note.innerHTML='Enregistré automatiquement <b>sur cet appareil</b>. Statut : cliquez dessus · responsable : la pastille · renommer : double-clic.';
+      const ex=document.createElement('button');ex.className='btn alt';ex.textContent='Exporter';ex.style.fontSize='14px';ex.style.padding='8px 14px';ex.title='Télécharger tasks.json pour le partager';
+      ex.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'}));a.download='tasks.json';document.body.append(a);a.click();a.remove();};
+      const rs=document.createElement('button');rs.className='btn alt';rs.textContent='Version de l\'équipe';rs.style.fontSize='14px';rs.style.padding='8px 14px';rs.title='Oublier mes modifications locales';
+      rs.onclick=()=>{try{localStorage.removeItem(LOCAL_KEY);}catch(e){}DATA=JSON.parse(JSON.stringify(TEAM_DATA||FALLBACK));renderTracker();toast('Version de l\'équipe rechargée');};
+      sv.append(ex,rs,note);}
+    body.append(sv);
   } else { const n=document.createElement('p');n.className='note';n.textContent='Lecture seule : seuls les membres de l\'équipe avec un accès en écriture peuvent modifier ce tableau.';body.append(n);}
 }
 async function save(btn,note){
   if(!artifactNS){note.textContent='L\'enregistrement n\'est pas disponible ici : ouvrez la page depuis Claude avec un accès en écriture.';return;}
-  DATA.updated=new Date().toISOString().slice(0,10);btn.disabled=true;note.textContent='Enregistrement…';
+  stamp();btn.disabled=true;note.textContent='Enregistrement…';
   try{await artifactNS.publish({'data/tasks.json':{content:JSON.stringify(DATA,null,2),contentType:'application/json'}});dirty=false;renderTracker();$('saveNote').textContent='Enregistré : toute l\'équipe voit cette version.';}
   catch(e){const c=e&&e.code;
     if(c==='conflict')note.textContent='Quelqu\'un vient d\'enregistrer : la page se recharge avec sa version.';
     else if(['not_writer','not_granted','capability_disabled','consent_required','not_declared'].includes(c)){readOnly=true;renderTracker();}
     else{btn.disabled=false;note.textContent='Échec de l\'enregistrement, réessayez dans un instant.';}}
 }
-fetch('data/tasks.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.tasks&&!dirty){DATA=j;if(sheetKind==='done'||sheetKind==='todo')renderTracker();}}).catch(()=>{});
-if(!window.claude)readOnly=true; // public copy (GitHub Pages): tracker is read-only, edits happen in the Claude version
+let TEAM_DATA=null;
+(function loadLocal(){if(IN_CLAUDE)return;try{const j=JSON.parse(localStorage.getItem(LOCAL_KEY)||'null');if(j&&j.tasks)DATA=j;}catch(e){}})();
+fetch('data/tasks.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.tasks)return;TEAM_DATA=j;let local=null;if(!IN_CLAUDE){try{local=localStorage.getItem(LOCAL_KEY);}catch(e){}}if(!dirty&&!local){DATA=j;if(sheetKind==='done'||sheetKind==='todo')renderTracker();}}).catch(()=>{});
 (async()=>{try{artifactNS=window.claude?await window.claude.use('artifact'):null;}catch(e){artifactNS=null;}})();
 
 /* jumbotron click → team */
