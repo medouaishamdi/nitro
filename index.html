@@ -216,6 +216,50 @@ ul.ideas li{margin:5px 0;line-height:1.45}
 @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
 .end{position:fixed;inset:0;z-index:12;display:grid;place-items:center;background:rgba(16,33,59,.35);padding:16px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* tour (mode présentation) */
+.tourbar{position:fixed;z-index:20;left:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:min(560px,calc(100vw - 620px));min-width:330px;display:none;align-items:center;gap:12px;background:#fff;border-radius:20px;padding:12px 12px 12px 14px;box-shadow:0 14px 40px rgba(16,33,59,.28)}
+body.touring .tourbar{display:flex}
+body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .padprompt{display:none!important}
+.tourbar .n{flex:none;width:52px;height:52px;border-radius:15px;background:var(--ink);color:#fff;font-family:var(--display);display:grid;place-items:center;font-size:15px}
+.tourbar .tx{flex:1;min-width:0}
+.tourbar .tx b{display:block;font-family:var(--display);font-weight:400;font-size:22px;line-height:1.1;color:var(--ink)}
+.tourbar .tx span{display:block;font-size:13.5px;font-weight:700;color:var(--muted);line-height:1.35;margin-top:2px}
+.tourbar .bar2{position:absolute;left:14px;right:14px;top:0;height:4px;border-radius:0 0 4px 4px;background:var(--mist);overflow:hidden}
+.tourbar .bar2 i{display:block;height:100%;background:var(--orange);transition:width .4s}
+.tourbar button{flex:none;border-radius:12px;padding:10px 12px;font-weight:900;background:var(--mist);color:var(--ink)}
+.tourbar button.go{background:var(--orange);color:#fff}
+.tourbar .keys{position:absolute;right:16px;top:-26px;font-size:11.5px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+@media (max-width:900px){.tourbar{left:10px;right:10px;width:auto;min-width:0}.tourbar .keys{display:none}}
+.qrbig{position:fixed;z-index:19;right:6vw;top:46%;transform:translateY(-50%) scale(.8);opacity:0;pointer-events:none;transition:.45s cubic-bezier(.3,1.4,.4,1);background:#fff;border-radius:26px;padding:22px 22px 18px;text-align:center;box-shadow:0 24px 70px rgba(16,33,59,.35)}
+.qrbig.show{opacity:1;transform:translateY(-50%) scale(1);pointer-events:auto}
+@media (max-width:900px){.qrbig{right:auto;left:50%;transform:translate(-50%,-50%) scale(.8)}.qrbig.show{transform:translate(-50%,-50%) scale(1)}}
+.qrbig canvas{width:min(300px,62vw);height:auto;aspect-ratio:1;display:block;margin:0 auto;image-rendering:pixelated}
+.qrbig b{display:block;font-family:var(--display);font-weight:400;font-size:26px;color:var(--ink);margin-top:10px}
+.qrbig span{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--orange-d)}
+/* player cards */
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;perspective:1200px}
+.pcard{aspect-ratio:3/4.1}
+.pf{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;overflow:hidden;color:#fff;box-shadow:0 10px 26px rgba(16,33,59,.25)}
+.pf.front{background:radial-gradient(120% 80% at 80% 0%,rgba(255,255,255,.35),transparent 55%),linear-gradient(160deg,var(--c),#10213b 135%);border:3px solid rgba(255,255,255,.55)}
+.pf.front::after{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.28) 50%,transparent 58%);transform:translateX(-60%);transition:transform .9s;pointer-events:none}
+.pcard:hover .pf.front::after{transform:translateX(60%)}
+.pf .rt{position:absolute;left:12px;top:10px;text-align:center;line-height:1}
+.pf .rt b{display:block;font-family:var(--display);font-weight:400;font-size:34px}
+.pf .rt small{font-size:9.5px;font-weight:900;letter-spacing:.14em;opacity:.85}
+.pf .pos{display:block;margin-top:6px;font-size:9.5px;font-weight:900;letter-spacing:.1em;background:rgba(255,255,255,.22);border-radius:999px;padding:3px 7px;max-width:90px}
+.pf .no{position:absolute;right:12px;top:6px;font-family:var(--display);font-style:normal;font-size:30px;opacity:.35}
+.pf .big{position:absolute;left:50%;top:30%;transform:translateX(-50%);width:42%;aspect-ratio:1;border-radius:24px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.5);display:grid;place-items:center;font-family:var(--display);font-size:clamp(22px,6vw,34px)}
+.pf .nm{position:absolute;left:8px;right:8px;top:66%;text-align:center;font-weight:900;font-size:11.5px;letter-spacing:.08em;line-height:1.15}
+.pf .nm b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(15px,4vw,19px);letter-spacing:.02em}
+.pf .sts{position:absolute;left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-top:1px solid rgba(255,255,255,.35);padding-top:6px;text-align:center}
+.pf .sts span{font-size:8.5px;font-weight:900;letter-spacing:.06em;opacity:.9}
+.pf .sts b{display:block;font-family:var(--display);font-weight:400;font-size:17px}
+.pf.back{transform:rotateY(180deg);background:#fff;color:var(--ink);border:3px solid var(--c);padding:12px;overflow:auto}
+.pf.back h4{margin:0 0 6px;font-family:var(--display);font-weight:400;font-size:15px;color:var(--c)}
+.pf.back ul{list-style:none;margin:0;padding:0}
+.pf.back li{display:flex;gap:7px;align-items:flex-start;font-size:12px;font-weight:700;line-height:1.3;margin:6px 0}
+.pf.back li i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:3px;background:var(--d)}
+.pf.back p{font-size:12px;font-weight:700;color:var(--muted);line-height:1.4;margin:0}
 </style>
 
 <canvas id="game" aria-label="Stade NITRO Arena en 3D : une voiture radiocommandée pousse un ballon vers deux buts"></canvas>
@@ -238,6 +282,7 @@ ul.ideas li{margin:5px 0;line-height:1.45}
     <button class="chip shadow" data-open="tele" style="--c:var(--volt)"><i></i><span class="lbl">Télémétrie</span></button>
     <button class="chip shadow" data-open="team" style="--c:var(--red)"><i></i><span class="lbl">Équipe</span></button>
     <button class="chip shadow" data-open="atelier" style="--c:var(--violet)"><i></i><span class="lbl">Atelier</span></button>
+    <button class="chip shadow" id="tourChip" style="--c:var(--orange)" title="Mode présentation (touche P)"><i></i><span class="lbl">Présenter</span></button>
     <button class="chip icon shadow" id="sndBtn" aria-label="Couper le son">🔊</button>
   </nav>
 </div>
@@ -253,7 +298,7 @@ ul.ideas li{margin:5px 0;line-height:1.45}
   <div class="hints shadow" id="hints">
     <span class="k">Z</span><span class="k">Q</span><span class="k">S</span><span class="k">D</span> ou flèches · conduire<br>
     <span class="k">⇧</span> / <span class="k">Espace</span> boost · <span class="k">H</span> klaxon<br>
-    <span class="k">O</span> ouvrir un cercle · <span class="k">C</span> caméra
+    <span class="k">O</span> ouvrir un cercle · <span class="k">C</span> caméra<br><span class="k">P</span> mode présentation
   </div>
   <div class="dial shadow" id="dial" style="--b:33"><b id="boostN">33</b><small>BOOST</small></div>
 </div>
@@ -265,6 +310,8 @@ ul.ideas li{margin:5px 0;line-height:1.45}
 </div>
 
 <div class="center" id="center"></div>
+<div class="tourbar" id="tourBar" role="region" aria-label="Mode présentation"><div class="bar2"><i id="tbP"></i></div><span class="keys">→ suivant · ← retour · Échap quitter</span><div class="n" id="tbN">1/8</div><div class="tx"><b id="tbT"></b><span id="tbS"></span></div><button id="tbPrev" aria-label="Étape précédente">◀</button><button class="go" id="tbNext">Suivant ▶</button><button id="tbX" aria-label="Quitter le mode présentation">✕</button></div>
+<div class="qrbig" id="qrBig"><canvas id="qrCv" width="330" height="330" aria-label="QR code vers le site"></canvas><b>À vous de jouer !</b><span>medouaishamdi.github.io/nitro</span></div>
 <div class="flash" id="flash"></div>
 <div class="toast" id="toast" role="status"></div>
 <button class="padprompt" id="padPrompt" aria-live="polite"><span class="key">O</span><span>Ouvrir <b id="padName">PROJET</b></span></button>
@@ -285,6 +332,7 @@ ul.ideas li{margin:5px 0;line-height:1.45}
     <div class="cta">
       <button class="btn" id="playBtn">Coup d'envoi</button>
       <button class="btn alt" id="exploreBtn">Explorer sans jouer</button>
+      <button class="btn alt" id="tourBtn" title="Touche P">▶ Mode présentation</button>
     </div>
     <div class="team">Équipe · <b>Aymen Ellili</b> · <b>Mohamed Ouais Hamdi</b> · <b>Eya Moalla</b> · <b>Oussama Taieb</b></div>
   </div>
@@ -581,10 +629,16 @@ function build(){
   confetti=new THREE.Points(cg,new THREE.PointsMaterial({size:.45,vertexColors:true}));confetti.frustumCulled=false;scene.add(confetti);
 }
 
+const QR=["000000000000000000000000000000000", "000000000000000000000000000000000", "001111111001000100101110111111100", "001000001001010111010000100000100", "001011101010111010000110101110100", "001011101010001101110100101110100", "001011101011100100111100101110100", "001000001011001111001010100000100", "001111111010101010101010111111100", "000000000011100011100000000000000", "001011111001010001110100111110000", "000001000100001100100110111000100", "001110101101000111100000010000000", "000011010111011101001010010101000", "001110111110101010010000000110000", "001010110100011000111111111000100", "000010001001110001001011001110000", "001011100111001010101010011001000", "001101011111100000010100000110000", "001101100011001110100111111010100", "001001011001001111100011111010000", "001010110100110100100000011001000", "001011001001001010010011111011100", "000000000011100000001010001111100", "001111111000101001111110101110000", "001000001010000010101110001001100", "001011101010101000011011111010000", "001011101011011010111000000111100", "001011101011001001110010111111000", "001000001000111011001011011101000", "001111111011111000010100110010000", "000000000000000000000000000000000", "000000000000000000000000000000000"],SITE_URL='https://medouaishamdi.github.io/nitro/';
+function drawQR(g,x,y,S){const n=QR.length,c=S/n;g.fillStyle='#fff';g.fillRect(x,y,S,S);g.fillStyle='#10213b';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(QR[r][k]==='1')g.fillRect(Math.floor(x+k*c),Math.floor(y+r*c),Math.ceil(c),Math.ceil(c));}
 function drawJumbo(kind,data){
   if(!jumboCtx)return;const g=jumboCtx,w=1024,h=400;
   const bg=g.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#10213b');bg.addColorStop(1,'#1a3a6b');g.fillStyle=bg;g.fillRect(0,0,w,h);
   g.textAlign='center';g.textBaseline='middle';
+  if(kind==='qr'){g.textAlign='left';g.fillStyle='#ffcc29';g.font='30px "Russo One", Impact, sans-serif';g.fillText('SCANNEZ LE QR CODE',60,80);
+    g.fillStyle='#fff';g.font='78px "Russo One", Impact, sans-serif';g.fillText('JOUEZ',56,170);g.fillStyle='#ff7a1a';g.fillText('SUR MOBILE',56,252);
+    g.fillStyle='rgba(255,255,255,.85)';g.font='26px "Russo One", Impact, sans-serif';g.fillText('MEDOUAISHAMDI.GITHUB.IO/NITRO',58,330);
+    g.fillStyle='#fff';g.fillRect(650,26,348,348);drawQR(g,660,36,328);jumboTex.needsUpdate=true;return;}
   if(kind==='goal'){g.fillStyle=data.col;g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='170px "Russo One", Impact, sans-serif';g.fillText('BUT !',w/2,h/2-30);g.font='44px "Russo One", Impact, sans-serif';g.fillText(data.sub,w/2,h/2+105);}
   else{
     g.fillStyle='#ffcc29';g.font='30px "Russo One", Impact, sans-serif';g.fillText('NITRO ARENA · L\'ÉQUIPE',w/2,52);
@@ -660,7 +714,7 @@ function scoreGoal(side){
   G.shake=reduce?0:1;G.slowmo=1.2;G.cheer=3.5;
   burst(done?FX:-FX,done);
   drawJumbo('goal',{col:done?'#ff7a1a':'#1f7cff',sub:done?'CE QUI EST FAIT':'CE QU\'IL RESTE À FAIRE'});
-  setTimeout(()=>{openSheet(done?'done':'todo');setJumbo('replay');},1700);
+  const tok=G.goalTok=(G.goalTok||0)+1;setTimeout(()=>{if(G.goalTok!==tok)return;openSheet(done?'done':'todo');setJumbo('replay');},1700);
 }
 function burst(x,orange){
   const p=confetti.geometry.attributes.position.array;
@@ -756,11 +810,12 @@ function step(now){
     for(const c of clouds){c.position.x+=dt*1.2;if(c.position.x>140)c.position.x=-140;}
     // camera
     let want,look;
-    if(G.mode==='intro'||G.mode==='explore'){const a=now/9000;want=new THREE.Vector3(Math.cos(a)*58,30,Math.sin(a)*44);look=new THREE.Vector3(0,0,0);}
+    if(G.mode==='tour'&&G.tourCam){want=new THREE.Vector3(...G.tourCam[0]);look=new THREE.Vector3(...G.tourCam[1]);}
+    else if(G.mode==='intro'||G.mode==='explore'){const a=now/9000;want=new THREE.Vector3(Math.cos(a)*58,30,Math.sin(a)*44);look=new THREE.Vector3(0,0,0);}
     else if(G.ballCam){const dx=ball.x-car.x,dz=ball.z-car.z,dl=Math.hypot(dx,dz)||1;want=new THREE.Vector3(car.x-dx/dl*12,7,car.z-dz/dl*12);look=new THREE.Vector3(ball.x,1.5,ball.z);}
     else{want=new THREE.Vector3(car.x-Math.sin(car.h)*13,8,car.z-Math.cos(car.h)*13);look=new THREE.Vector3(car.x+Math.sin(car.h)*5,1.2,car.z+Math.cos(car.h)*5);}
     if(!camPos){camPos=want.clone();camLook=look.clone();}
-    const k=Math.min(1,dt*(G.mode==='play'?4:1.5));camPos.lerp(want,k);camLook.lerp(look,Math.min(1,dt*5));
+    const k=Math.min(1,dt*(G.mode==='play'?4:G.mode==='tour'?2.2:1.5));camPos.lerp(want,k);camLook.lerp(look,Math.min(1,dt*5));
     cam.position.copy(camPos);
     if(G.shake>0){G.shake-=dt*1.4;const s=G.shake*.9;cam.position.x+=(Math.random()-.5)*s;cam.position.y+=(Math.random()-.5)*s;}
     cam.fov+=((boostOn?62:52)-cam.fov)*Math.min(1,dt*3);cam.updateProjectionMatrix();
@@ -804,7 +859,7 @@ function drawChart(){
 /* ======================================================================
    SHEETS (sections) + shared tracker
    ====================================================================== */
-const FALLBACK={"updated": "2026-11-09", "tasks": [{"id": "t01", "part": "Voiture", "title": "Choisir le cerveau : deux cartes ESP32 avec Wi-Fi intégré", "status": "done"}, {"id": "t02", "part": "Liaison", "title": "Communication directe ESP32 → ESP32, sans box, par l'identifiant unique de la voiture", "status": "done"}, {"id": "t03", "part": "Voiture", "title": "Tester la carte moteur L298N (trop de chauffe, perte de puissance)", "status": "done"}, {"id": "t04", "part": "Voiture", "title": "Passer au DRV8871 : un hacheur qui contrôle le moteur", "status": "done"}, {"id": "t05", "part": "Voiture", "title": "Servomoteur de direction sur les roues avant", "status": "done"}, {"id": "t06", "part": "Voiture", "title": "Double alimentation : 7,4 V pour le moteur, 5 V pour l'ESP32 et le servo", "status": "done"}, {"id": "t07", "part": "Voiture", "title": "Code voiture : recevoir les ordres, régler l'angle et la vitesse", "status": "done"}, {"id": "t09", "part": "Manette", "title": "Manette : ESP32 + deux joysticks (gauche = direction, droite = vitesse)", "status": "done"}, {"id": "t10", "part": "Manette", "title": "Écran LCD 20×4 : DIR à gauche, GAZ à droite", "status": "done"}, {"id": "t11", "part": "Manette", "title": "Conduite progressive, 20 envois par seconde", "status": "done"}, {"id": "t12", "part": "Voiture", "title": "La voiture avance et tourne à gauche et à droite", "status": "done"}, {"id": "t13", "part": "Voiture", "title": "Marche arrière", "status": "todo"}, {"id": "t14", "part": "Voiture", "title": "LED jaunes en clignotants", "status": "todo"}, {"id": "t15", "part": "Voiture", "title": "LED rouges allumées en marche arrière", "status": "todo"}, {"id": "t16", "part": "Voiture", "title": "Klaxon", "status": "todo"}, {"id": "t17", "part": "Voiture", "title": "Coque de la voiture", "status": "todo"}, {"id": "t18", "part": "Manette", "title": "Coque de la manette", "status": "doing"}, {"id": "t19", "part": "Web & données", "title": "Base de données : sessions, télémétrie et événements", "status": "todo"}, {"id": "t20", "part": "Web & données", "title": "Calcul de la vitesse et envoi dans la base", "status": "todo"}, {"id": "t21", "part": "Web & données", "title": "Site web du projet (cette page) relié à la base", "status": "doing"}, {"id": "t22", "part": "Voiture", "title": "Capteur de température", "status": "dropped"}]};
+const FALLBACK={"updated": "2026-11-09", "tasks": [{"id": "t01", "part": "Voiture", "title": "Choisir le cerveau : deux cartes ESP32 avec Wi-Fi intégré", "status": "done"}, {"id": "t02", "part": "Liaison", "title": "Communication directe ESP32 → ESP32, sans box, par l'identifiant unique de la voiture", "status": "done"}, {"id": "t03", "part": "Voiture", "title": "Tester la carte moteur L298N (trop de chauffe, perte de puissance)", "status": "done"}, {"id": "t04", "part": "Voiture", "title": "Passer au DRV8871 : un hacheur qui contrôle le moteur", "status": "done"}, {"id": "t05", "part": "Voiture", "title": "Servomoteur de direction sur les roues avant", "status": "done"}, {"id": "t06", "part": "Voiture", "title": "Double alimentation : 7,4 V pour le moteur, 5 V pour l'ESP32 et le servo", "status": "done"}, {"id": "t07", "part": "Voiture", "title": "Code voiture : recevoir les ordres, régler l'angle et la vitesse", "status": "done"}, {"id": "t09", "part": "Manette", "title": "Manette : ESP32 + deux joysticks (gauche = direction, droite = vitesse)", "status": "done"}, {"id": "t10", "part": "Manette", "title": "Écran LCD 20×4 : DIR à gauche, GAZ à droite", "status": "done"}, {"id": "t11", "part": "Manette", "title": "Conduite progressive, 20 envois par seconde", "status": "done"}, {"id": "t12", "part": "Voiture", "title": "La voiture avance et tourne à gauche et à droite", "status": "done"}, {"id": "t13", "part": "Voiture", "title": "Marche arrière", "status": "todo", "owner": "AE"}, {"id": "t14", "part": "Voiture", "title": "LED jaunes en clignotants", "status": "todo"}, {"id": "t15", "part": "Voiture", "title": "LED rouges allumées en marche arrière", "status": "todo"}, {"id": "t16", "part": "Voiture", "title": "Klaxon", "status": "todo"}, {"id": "t17", "part": "Voiture", "title": "Coque de la voiture", "status": "todo"}, {"id": "t18", "part": "Manette", "title": "Coque de la manette", "status": "doing"}, {"id": "t19", "part": "Web & données", "title": "Base de données : sessions, télémétrie et événements", "status": "todo"}, {"id": "t20", "part": "Web & données", "title": "Calcul de la vitesse et envoi dans la base", "status": "todo"}, {"id": "t21", "part": "Web & données", "title": "Site web du projet (cette page) relié à la base", "status": "doing", "owner": "MH"}, {"id": "t22", "part": "Voiture", "title": "Capteur de température", "status": "dropped"}]};
 let DATA=JSON.parse(JSON.stringify(FALLBACK)),dirty=false,readOnly=false,artifactNS=null,sheetOpen=false,sheetKind=null,trackerView='done';
 const LABEL={todo:'À faire',doing:'En cours',done:'Fait',dropped:'Retiré'},COL={done:'var(--green)',doing:'var(--blue)',todo:'var(--orange)',dropped:'#9aa8bb'},ORDER=['todo','doing','done'];
 const SHEETS={
@@ -820,7 +875,7 @@ function openSheet(kind){
   const s=SHEETS[kind];sheetKind=kind;sheetOpen=true;keys.clear();car.inT=car.inS=0;
   $('sheetKick').textContent=s.kick;$('sheetTitle').textContent=s.title;$('sheet').style.setProperty('--hc',s.hc);
   const body=$('sheetBody');body.innerHTML='';
-  if(s.tpl)body.append($(s.tpl).content.cloneNode(true));else{trackerView=kind;renderTracker();}
+  if(kind==='team')renderTeam();else if(s.tpl)body.append($(s.tpl).content.cloneNode(true));else{trackerView=kind;renderTracker();}
   $('sheet').classList.add('open');$('sheet').setAttribute('aria-hidden','false');sfx.open();
   if(kind==='team'&&!G.goalLock)setJumbo('team');
   setTimeout(()=>$('closeSheet').focus(),50);
@@ -834,7 +889,28 @@ document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openSheet(b.da
 const TEAM=[['','Personne','#9aa8bb'],['AE','Aymen Ellili','#1f7cff'],['MH','Mohamed Ouais Hamdi','#ff7a1a'],['EM','Eya Moalla','#22b45a'],['OT','Oussama Taieb','#f0384b']];
 const LOCAL_KEY='nitro-tasks-v3';try{localStorage.removeItem('nitro-tasks-v1');localStorage.removeItem('nitro-tasks-v2');}catch(e){}const IN_CLAUDE=!!window.claude;let pendingDel=null;
 function stamp(){DATA.updated=new Date().toISOString().slice(0,10);}
-function changed(){stamp();dirty=true;if(!IN_CLAUDE){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(DATA));}catch(e){}dirty=false;}renderTracker();}
+const PEND_KEY='nitro-pending-v3';let saveT=0,saving=false,saveFails=0;
+function changed(){stamp();dirty=true;
+  if(!IN_CLAUDE){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(DATA));}catch(e){}dirty=false;}
+  else{try{localStorage.setItem(PEND_KEY,JSON.stringify(DATA));}catch(e){}queueSave(1200);}
+  renderTracker();}
+function setNote(t){const n=$('saveNote');if(n)n.textContent=t;}
+function queueSave(ms){clearTimeout(saveT);saveT=setTimeout(autoSave,ms);setNote('Enregistrement…');}
+async function autoSave(){
+  if(!dirty||readOnly)return;
+  if(!artifactNS){queueSave(1500);return;}
+  if(saving){queueSave(800);return;}
+  saving=true;stamp();const snap=JSON.stringify(DATA,null,2);
+  try{await artifactNS.publish({'data/tasks.json':{content:snap,contentType:'application/json'}});saveFails=0;
+    if(JSON.stringify(DATA,null,2)===snap){dirty=false;try{localStorage.removeItem(PEND_KEY);}catch(e){}setNote('✓ Enregistré pour toute l\'équipe à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'.');}
+    else queueSave(300);}
+  catch(e){const c=e&&e.code;
+    if(['not_writer','not_granted','capability_disabled','consent_required','not_declared'].includes(c)){readOnly=true;renderTracker();}
+    else{saveFails++;setNote(saveFails>3?'Pas encore enregistré (connexion ?) : vos changements restent gardés sur cet appareil, nouvel essai…':'Nouvel essai d\'enregistrement…');queueSave(saveFails>3?10000:3000);}}
+  finally{saving=false;}
+}
+addEventListener('pagehide',()=>{if(IN_CLAUDE&&dirty)autoSave();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&IN_CLAUDE&&dirty){clearTimeout(saveT);autoSave();}});
 function celebrate(t){try{if(THREE_OK&&confetti){burst(FX,true);G.cheer=2.5;}sfx.horn();}catch(e){}toast('✅ « '+t.title+' » : but pour l\'équipe !');}
 function renderTracker(){
   const body=$('sheetBody');body.innerHTML='';
@@ -877,10 +953,8 @@ function renderTracker(){
     ab.onclick=doAdd;add.append(ab);body.append(add);
     setTimeout(()=>{const n=$('newTask');if(n)n.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')doAdd();};},0);
     const sv=document.createElement('div');sv.className='save';
-    if(IN_CLAUDE){const sb=document.createElement('button');sb.className='btn blue';sb.textContent='Enregistrer';sb.style.fontSize='16px';sb.disabled=!dirty;sb.style.opacity=dirty?1:.5;
-      const note=document.createElement('span');note.className='note';note.id='saveNote';note.textContent=dirty?'Modifications non enregistrées.':'Statut : choisissez-le dans la liste. Responsable : cliquez sur la pastille. Renommer : double-clic. Puis enregistrez pour toute l\'équipe.';
-      sb.onclick=()=>save(sb,note);sv.append(sb,note);}
-    else{const note=document.createElement('span');note.className='note';note.id='saveNote';note.innerHTML='Enregistré automatiquement <b>sur cet appareil</b>. Statut : choisissez-le dans la liste · responsable : la pastille · renommer : double-clic.';
+    if(IN_CLAUDE){const note=document.createElement('span');note.className='note';note.id='saveNote';note.textContent=dirty?'Enregistrement…':'Enregistrement automatique pour toute l\'équipe. Statut : la liste · responsable : la pastille · renommer : double-clic.';sv.append(note);}
+    else{const note=document.createElement('span');note.className='note';note.id='saveNote';note.innerHTML='✓ Enregistré automatiquement <b>sur cet appareil</b> : tout reste là quand vous fermez et rouvrez la page. Statut : choisissez-le dans la liste · responsable : la pastille · renommer : double-clic.';
       const ex=document.createElement('button');ex.className='btn alt';ex.textContent='Exporter';ex.style.fontSize='14px';ex.style.padding='8px 14px';ex.title='Télécharger tasks.json pour le partager';
       ex.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'}));a.download='tasks.json';document.body.append(a);a.click();a.remove();};
       const rs=document.createElement('button');rs.className='btn alt';rs.textContent='Version de l\'équipe';rs.style.fontSize='14px';rs.style.padding='8px 14px';rs.title='Oublier mes modifications locales';
@@ -888,6 +962,24 @@ function renderTracker(){
       sv.append(ex,rs,note);}
     body.append(sv);
   } else { const n=document.createElement('p');n.className='note';n.textContent='Lecture seule : seuls les membres de l\'équipe avec un accès en écriture peuvent modifier ce tableau.';body.append(n);}
+}
+const ROLE={MH:'SITE & PRÉSENTATION'};
+function renderTeam(){
+  const body=$('sheetBody');body.innerHTML='';
+  const live=DATA.tasks.filter(t=>t.status!=='dropped'),assigned=live.filter(t=>t.owner).length;
+  const intro=document.createElement('p');intro.innerHTML='Quatre pilotes, une voiture (ordre alphabétique). <b>Cliquez sur une carte</b> pour voir ses tâches.';body.append(intro);
+  const grid=document.createElement('div');grid.className='pgrid';
+  const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  TEAM.slice(1).forEach(([ini,name,col],i)=>{
+    const mine=live.filter(t=>t.owner===ini),n=k=>mine.filter(t=>t.status===k).length;
+    const parts={};mine.forEach(t=>parts[t.part]=(parts[t.part]||0)+1);const top=Object.keys(parts).sort((a,b)=>parts[b]-parts[a])[0];
+    const pos=ROLE[ini]||(top?top.toUpperCase():'PILOTE');const ws=name.split(' '),last=ws.pop(),mid=ws.join(' ');
+    const w=document.createElement('div');w.className='flip pcard';w.tabIndex=0;w.setAttribute('role','button');w.setAttribute('aria-label','Carte de '+name+' : cliquer pour voir ses tâches');w.style.setProperty('--c',col);
+    w.innerHTML=`<div class="pf front"><div class="rt"><b>${n('done')}</b><small>FAITES</small><span class="pos">${esc(pos)}</span></div><i class="no">0${i+1}</i><div class="big">${ini}</div><div class="nm">${esc(mid.toUpperCase())}<b>${esc(last.toUpperCase())}</b></div><div class="sts"><span><b>${n('done')}</b>FAIT</span><span><b>${n('doing')}</b>EN COURS</span><span><b>${n('todo')}</b>À FAIRE</span></div></div>`+
+      `<div class="pf back"><h4>${esc(name)}</h4>${mine.length?'<ul>'+mine.map(t=>`<li style="--d:${COL[t.status]}"><i></i><span>${esc(t.title)} · <em>${LABEL[t.status]}</em></span></li>`).join('')+'</ul>':'<p>Aucune tâche assignée pour l\'instant. Dans « Fait » ou « À faire », cliquez sur la pastille d\'une tâche pour la lui donner.</p>'}</div>`;
+    grid.append(w);});
+  body.append(grid);
+  const nt=document.createElement('p');nt.className='note';nt.textContent=`${assigned} tâche${assigned>1?'s':''} sur ${live.length} ont un responsable. Les cartes se mettent à jour toutes seules.`;body.append(nt);
 }
 async function save(btn,note){
   if(!artifactNS){note.textContent='L\'enregistrement n\'est pas disponible ici : ouvrez la page depuis Claude avec un accès en écriture.';return;}
@@ -899,7 +991,7 @@ async function save(btn,note){
     else{btn.disabled=false;note.textContent='Échec de l\'enregistrement, réessayez dans un instant.';}}
 }
 let TEAM_DATA=null;
-(function loadLocal(){if(IN_CLAUDE)return;try{const j=JSON.parse(localStorage.getItem(LOCAL_KEY)||'null');if(j&&j.tasks)DATA=j;}catch(e){}})();
+(function loadLocal(){try{const j=JSON.parse(localStorage.getItem(IN_CLAUDE?PEND_KEY:LOCAL_KEY)||'null');if(j&&j.tasks){DATA=j;if(IN_CLAUDE){dirty=true;queueSave(2500);}}}catch(e){}})();
 fetch('data/tasks.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.tasks)return;TEAM_DATA=j;let local=null;if(!IN_CLAUDE){try{local=localStorage.getItem(LOCAL_KEY);}catch(e){}}if(!dirty&&!local){DATA=j;if(sheetKind==='done'||sheetKind==='todo')renderTracker();}}).catch(()=>{});
 (async()=>{try{artifactNS=window.claude?await window.claude.use('artifact'):null;}catch(e){artifactNS=null;}})();
 
@@ -934,7 +1026,7 @@ function vidSafe(){if(!jVidOK||jVid.readyState<2)return false;try{const c=docume
 function setJumbo(m){
   if((m==='live'||m==='replay')&&!jVidOK)m='team';
   jMode=m;jT=0;
-  if(m==='team'){jVid.pause();drawJumbo('team');}
+  if(m==='team'||m==='qr'){jVid.pause();drawJumbo(m);}
   else{if(m==='replay')try{jVid.currentTime=0;}catch(e){}const p=jVid.play();if(p&&p.catch)p.catch(()=>{jVidOK=false;setJumbo('team');});}
 }
 function drawJumboVideo(){
@@ -955,8 +1047,10 @@ function drawJumboVideo(){
 }
 function jumboTick(dt,now){
   if(!jumboCtx)return;jT+=dt;
-  if(jMode==='team'){if(jT>11&&!G.goalLock&&jVidOK&&!document.hidden)setJumbo('live');return;}
-  if(jMode==='live'&&jT>13){setJumbo('team');return;}
+  if(G.tourHold&&jMode!=='live'&&jMode!=='replay')return;
+  if(jMode==='team'){if(jT>11&&!G.goalLock&&!document.hidden)setJumbo(jVidOK?'live':'qr');return;}
+  if(jMode==='qr'){if(jT>9&&!G.goalLock)setJumbo('team');return;}
+  if(jMode==='live'&&jT>13&&!G.tourHold){setJumbo('qr');return;}
   jVid.playbackRate=jMode==='replay'?.5:1;
   if(now-jLast>33&&vidSafe()){jLast=now;drawJumboVideo();}
 }
@@ -981,5 +1075,55 @@ $('sheetBody').addEventListener('keydown',e=>{const f=e.target.closest&&e.target
 
 function openPad(){const p=G.padNear;if(!p)return;$('padPrompt').classList.remove('show');G.padNear=null;openSheet(p.id);}
 $('padPrompt').onclick=openPad;
-window.__nitro={G,car,ball,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB};
+/* ======================================================================
+   MODE PRÉSENTATION — visite guidée, touche P (→ / ← / Échap, compatible télécommande)
+   ====================================================================== */
+const JB=[0,19,-(FZ+16)];
+const TOUR=[
+ {t:'NITRO, notre voiture radiocommandée',s:'Une voiture et sa manette, construites autour de deux ESP32 qui se parlent en direct.',cam:[[0,40,58],[0,0,0]],go:()=>openSheet('projet')},
+ {t:'Sous le capot',s:'Le hacheur DRV8871 contrôle le moteur, le servomoteur tourne les roues, double alimentation 7,4 V / 5 V.',cam:[[-30,18,30],[0,0,0]],go:()=>openSheet('archi')},
+ {t:'But ! Ce qui est déjà fait',s:'Un but chez Orange affiche les tâches terminées, en direct.',cam:[[FX-4,12,26],[FX+10,1,0]],go:()=>{G.score={b:0,o:0};scoreGoal('o');}},
+ {t:'Contre son camp : la suite',s:'Un but dans notre cage affiche ce qu\'il reste à faire.',cam:[[-FX+18,12,26],[-FX+10,1,0]],go:()=>scoreGoal('b')},
+ {t:'Le vrai NITRO',s:'Photos du prototype et la vidéo de la démo du 7 novembre sur l\'écran géant.',cam:[[12,15,2],[12,JB[1]-2,JB[2]]],go:()=>{openSheet('atelier');setJumbo('live');}},
+ {t:'L\'équipe',s:'Quatre pilotes : chaque carte montre les tâches de chacun.',cam:[[12,15,2],[12,JB[1]-2,JB[2]]],go:()=>{setJumbo('team');openSheet('team');}},
+ {t:'La suite : les données',s:'Base de données (sessions, télémétrie, événements) puis la vitesse affichée sur le site.',cam:[[24,22,30],[0,0,0]],go:()=>openSheet('tele')},
+ {t:'À vous de jouer !',s:'Scannez le QR code : le site marche aussi sur téléphone.',cam:[[11,14,0],[11,JB[1]-1,JB[2]]],go:()=>{setJumbo('qr');$('qrBig').classList.add('show');}}
+];
+let tourI=-1,tourBack=null;
+function tourStep(i){
+  if(i<0||i>=TOUR.length)return;tourI=i;const st=TOUR[i];
+  $('qrBig').classList.remove('show');
+  if(sheetOpen){G.goalLock=false;closeSheet();}G.goalLock=false;clearTimeout(kickTimer);$('center').innerHTML='';
+  ball.x=0;ball.z=0;ball.y=ball.r;ball.vx=ball.vz=ball.vy=0;car.x=-6;car.z=6;car.h=Math.PI*.75;car.speed=0;
+  G.goalTok=(G.goalTok||0)+1;G.tourCam=st.cam;G.tourHold=true;
+  $('tbN').textContent=(i+1)+'/'+TOUR.length;$('tbT').textContent=st.t;$('tbS').textContent=st.s;$('tbP').style.width=((i+1)/TOUR.length*100)+'%';
+  $('tbPrev').disabled=i===0;$('tbNext').textContent=i===TOUR.length-1?'Terminer ✓':'Suivant ▶';
+  sfx.beep(false);setTimeout(()=>{if(tourI===i)st.go();},i===2||i===3?650:250);
+}
+function startTour(){
+  if(tourI>=0)return;audioInit();if($('intro'))$('intro').remove();document.querySelectorAll('.end').forEach(e=>e.remove());
+  tourBack=G.mode==='intro'?'explore':G.mode;G.mode='tour';G.frozen=true;keys.clear();car.inT=car.inS=0;
+  document.body.classList.add('touring');tourStep(0);setTimeout(()=>$('tbNext').focus(),60);
+}
+function endTour(){
+  if(tourI<0)return;tourI=-1;G.tourHold=false;G.tourCam=null;$('qrBig').classList.remove('show');document.body.classList.remove('touring');
+  G.goalLock=false;if(sheetOpen)closeSheet();$('center').innerHTML='';setJumbo('team');
+  G.mode='explore';G.frozen=false;if(!document.querySelector('.btn.ui'))addPlay();toast('Fin de la visite. P pour la relancer.');
+}
+function tourNext(){if(tourI>=TOUR.length-1)endTour();else tourStep(tourI+1);}
+$('tbNext').onclick=tourNext;$('tbPrev').onclick=()=>tourStep(tourI-1);$('tbX').onclick=endTour;
+$('tourBtn').onclick=startTour;$('tourChip').onclick=()=>tourI>=0?endTour():startTour();
+addEventListener('keydown',e=>{
+  const tag=(e.target&&e.target.tagName)||'';if(/INPUT|SELECT|TEXTAREA/.test(tag)||lbOpen)return;
+  const k=e.key;
+  if(tourI>=0){
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Enter'&&e.target===document.body){e.preventDefault();e.stopImmediatePropagation();tourNext();}
+    else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();e.stopImmediatePropagation();tourStep(tourI-1);}
+    else if(k==='Escape'||k==='p'||k==='P'){e.preventDefault();e.stopImmediatePropagation();endTour();}
+    else e.stopImmediatePropagation();
+    return;}
+  if((k==='p'||k==='P')&&!e.repeat){e.preventDefault();e.stopImmediatePropagation();startTour();}
+},true);
+(function(){const c=$('qrCv');drawQR(c.getContext('2d'),0,0,330);})();
+window.__nitro={G,car,ball,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB,startTour,endTour,tourStep};
 </script>

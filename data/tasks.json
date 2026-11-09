@@ -71,7 +71,8 @@
       "id": "t13",
       "part": "Voiture",
       "title": "Marche arrière",
-      "status": "todo"
+      "status": "todo",
+      "owner": "AE"
     },
     {
       "id": "t14",
@@ -119,7 +120,8 @@
       "id": "t21",
       "part": "Web & données",
       "title": "Site web du projet (cette page) relié à la base",
-      "status": "doing"
+      "status": "doing",
+      "owner": "MH"
     },
     {
       "id": "t22",
