@@ -43,7 +43,7 @@ Le projet présenté sous forme de jeu de football 3D dans le navigateur (Three.
 - l'écran géant du stade diffuse la vraie voiture en vidéo, avec un replay après chaque but ;
 - l'écran en bas à gauche reproduit l'écran LCD de la vraie manette ;
 - commandes : flèches / ZQSD, Maj = boost, H = klaxon ; sur téléphone, deux joysticks tactiles.
-- **mode présentation** (touche **P**) : visite guidée en 8 étapes, → suivant, ← retour, compatible télécommande ;
+- **mode présentation** (touche **P**) : visite guidée en 9 étapes, dont l'assemblage 3D de la voiture pièce par pièce, → suivant, ← retour, compatible télécommande ;
 - section Équipe : une **carte joueur** par membre, avec ses tâches faites, en cours et à faire ;
 - **QR code** sur l'écran géant (et dans la présentation) pour ouvrir le site sur téléphone ;
 - la liste des tâches s'enregistre automatiquement : rien n'est perdu en fermant la page.
