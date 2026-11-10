@@ -1258,7 +1258,7 @@ function lpMode(m){
 function linkLine(line){
   if(!line.startsWith('N,'))return;const p=line.split(',');if(p.length<4)return;
   const a=parseInt(p[1],10),v=parseInt(p[2],10);if(isNaN(a)||isNaN(v))return;
-  LINK.ang=a;LINK.pwm=v;LINK.src=p[3].trim();LINK.last=performance.now();
+  LINK.ang=a;LINK.pwm=v;LINK.src=p[3].trim();if(!LINK.last||performance.now()-LINK.last>1000)lpSet(true,'Manette connectée');LINK.last=performance.now();
   LINK.s=Math.max(-1,Math.min(1,(90-a)/45));LINK.t=Math.max(-1,Math.min(1,v/255));
   $('lpA').textContent=a+'°';$('lpV').textContent=v;$('lpS').textContent=LINK.src==='W'?'site':'manette';
   $('lpWarn').classList.toggle('show',LINK.mode==='pilot'&&LINK.src==='M'&&(a!==90||v!==0));
@@ -1267,20 +1267,37 @@ async function linkConnect(){
   if(LINK.port){await linkClose();return;}
   if(!('serial' in navigator)){toast('Le lien USB marche dans Chrome ou Edge sur ordinateur (lien GitHub du site).');$('lpNote').textContent='Ce navigateur ne permet pas le lien USB : ouvrez medouaishamdi.github.io/nitro dans Chrome ou Edge sur ordinateur.';return;}
   let port;try{port=await navigator.serial.requestPort();}catch(e){return;}
-  try{await port.open({baudRate:115200});}catch(e){toast('Impossible d\'ouvrir le port : fermez le Moniteur série d\'Arduino IDE.');return;}
-  LINK.port=port;lpSet(true,'Manette connectée');
-  const enc=new TextEncoderStream();enc.readable.pipeTo(port.writable).catch(()=>{});LINK.writer=enc.writable.getWriter();
-  const dec=new TextDecoderStream();port.readable.pipeTo(dec.writable).catch(()=>{});const reader=dec.readable.getReader();LINK.reader=reader;
-  (async()=>{let buf='';try{while(true){const {value,done}=await reader.read();if(done)break;buf+=value;let i;while((i=buf.indexOf('\n'))>=0){linkLine(buf.slice(0,i).trim());buf=buf.slice(i+1);}if(buf.length>400)buf='';}}catch(e){}if(LINK.port)linkClose(true);})();
+  try{await port.open({baudRate:115200,bufferSize:4096});}catch(e){toast('Impossible d\'ouvrir le port : fermez Arduino IDE (Moniteur série).');return;}
+  try{await port.setSignals({dataTerminalReady:false,requestToSend:false});}catch(e){}
+  LINK.port=port;LINK.closing=false;lpSet(true,'Manette connectée, en attente des données…');
+  try{LINK.writer=port.writable.getWriter();}catch(e){LINK.writer=null;}
+  LINK.enc=new TextEncoder();
+  (async()=>{
+    const dec=new TextDecoder();let buf='';
+    while(LINK.port===port&&!LINK.closing&&port.readable){
+      let reader;try{reader=port.readable.getReader();}catch(e){break;}
+      LINK.reader=reader;
+      try{
+        while(true){const {value,done}=await reader.read();if(done)break;
+          buf+=dec.decode(value,{stream:true});let i;
+          while((i=buf.indexOf('\n'))>=0){linkLine(buf.slice(0,i).trim());buf=buf.slice(i+1);}
+          if(buf.length>400)buf='';}
+      }catch(e){/* caractères parasites au démarrage de la carte : on continue */}
+      finally{try{reader.releaseLock();}catch(e){}}
+    }
+    if(LINK.port===port&&!LINK.closing)linkClose(true);
+  })();
 }
+function linkSend(t){if(!LINK.writer)return Promise.resolve();return LINK.writer.write(LINK.enc.encode(t)).catch(()=>{});}
 async function linkClose(lost){
-  const port=LINK.port;LINK.port=null;lpMode('off');
-  try{if(LINK.writer){await LINK.writer.write('W,90,0\n').catch(()=>{});LINK.writer.releaseLock();}}catch(e){}
-  try{if(LINK.reader){await LINK.reader.cancel();}}catch(e){}
+  const port=LINK.port;if(!port)return;LINK.closing=true;LINK.port=null;lpMode('off');
+  try{await linkSend('W,90,0\n');}catch(e){}
+  try{if(LINK.writer)LINK.writer.releaseLock();}catch(e){}
+  try{if(LINK.reader)await LINK.reader.cancel();}catch(e){}
   try{await port.close();}catch(e){}
   LINK.writer=null;LINK.reader=null;lpSet(false,lost?'Manette débranchée':'Manette non connectée');['lpA','lpV','lpS'].forEach(id=>$(id).textContent='–');
 }
-function linkStop(){if(LINK.mode!=='off'){lpMode('off');toast('STOP : la vraie voiture s\'arrête');}if(LINK.writer)LINK.writer.write('W,90,0\n').catch(()=>{});}
+function linkStop(){if(LINK.mode!=='off'){lpMode('off');toast('STOP : la vraie voiture s\'arrête');}linkSend('W,90,0\n');}
 setInterval(()=>{
   if(!LINK.writer||LINK.mode!=='pilot'||LINK.busy)return;
   let a=90,v=0;
@@ -1288,7 +1305,7 @@ setInterval(()=>{
     const max=Math.max(70,Math.round(255*$('lpMax').value/100)),t=car.inT,sx=car.inS;
     a=Math.round(90-sx*45);v=t===0?0:Math.sign(t)*Math.round(70+(max-70)*Math.min(1,Math.abs(t)));
   }
-  LINK.busy=true;LINK.writer.write('W,'+a+','+v+'\n').catch(()=>{}).finally(()=>{LINK.busy=false;});
+  LINK.busy=true;linkSend('W,'+a+','+v+'\n').finally(()=>{LINK.busy=false;});
 },50);
 $('realChip').onclick=()=>$('linkPanel').classList.toggle('open');
 $('lpX').onclick=()=>$('linkPanel').classList.remove('open');
@@ -1296,7 +1313,7 @@ $('lpConn').onclick=linkConnect;$('lpStop').onclick=linkStop;
 document.querySelectorAll('[data-lm]').forEach(b=>b.onclick=()=>lpMode(LINK.mode===b.dataset.lm?'off':b.dataset.lm));
 $('lpMax').oninput=e=>{$('lpMaxV').textContent=e.target.value+' %';};
 addEventListener('keydown',e=>{if((e.key==='x'||e.key==='X')&&LINK.mode!=='off'&&!/INPUT|SELECT|TEXTAREA/.test((e.target&&e.target.tagName)||'')){linkStop();}},true);
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&LINK.mode==='pilot'&&LINK.writer)LINK.writer.write('W,90,0\n').catch(()=>{});});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&LINK.mode==='pilot')linkSend('W,90,0\n');});
 if('serial' in navigator)navigator.serial.addEventListener('disconnect',e=>{if(LINK.port&&e.target===LINK.port)linkClose(true);});
 window.__nitro={G,car,ball,LINK,linkLine,lpMode,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB,startTour,endTour,tourStep,startAssembly,ASM};
 </script>
