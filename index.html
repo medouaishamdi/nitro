@@ -241,6 +241,30 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
 .qrbig canvas{width:min(300px,62vw);height:auto;aspect-ratio:1;display:block;margin:0 auto;image-rendering:pixelated}
 .qrbig b{display:block;font-family:var(--display);font-weight:400;font-size:26px;color:var(--ink);margin-top:10px}
 .qrbig span{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--orange-d)}
+/* real car link panel (Web Serial) */
+.linkpanel{position:fixed;z-index:12;left:max(14px,env(safe-area-inset-left,0px));top:calc(78px + env(safe-area-inset-top,0px));width:300px;max-width:calc(100vw - 28px);background:var(--paper);border-radius:18px;padding:14px 14px 12px;display:none}
+.linkpanel.open{display:block}
+.lp-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.lp-h b{font-family:var(--display);font-weight:400;font-size:19px}
+.lp-h button{background:var(--mist);border-radius:10px;width:30px;height:30px;font-weight:900}
+.lp-st{font-size:12.5px;font-weight:800;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:7px}
+.lp-st i{width:10px;height:10px;border-radius:50%;background:#c4cfdc;flex:none}
+.lp-st.on i{background:var(--green);box-shadow:0 0 0 4px rgba(34,180,90,.2)}
+.linkpanel .btn{width:100%;font-size:15px;padding:11px 14px}
+.lp-modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 10px}
+.lp-modes button{background:var(--mist);border-radius:12px;padding:9px 6px;font-weight:900;font-size:14px;color:var(--ink);border:2px solid transparent}
+.lp-modes button small{display:block;font-size:10.5px;font-weight:800;color:var(--muted)}
+.lp-modes button.on{border-color:var(--orange);background:#fff4ea}
+.lp-modes button:disabled{opacity:.45;cursor:not-allowed}
+.lp-sp{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;color:var(--muted)}
+.lp-sp input{flex:1}
+.lp-live{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.lp-live span{background:var(--mist);border-radius:10px;padding:6px 4px;text-align:center;font-size:10.5px;font-weight:900;color:var(--muted);letter-spacing:.05em}
+.lp-live b{display:block;font-family:var(--mono);font-size:15px;color:var(--ink)}
+.lp-stop{width:100%;background:var(--red);color:#fff;border-radius:12px;padding:10px;font-family:var(--display);font-size:17px;letter-spacing:.05em}
+.lp-note{font-size:11.5px;font-weight:700;color:var(--muted);margin:8px 0 0;line-height:1.35}
+.lp-warn{background:#fff4ea;color:#b54d00;border-radius:10px;padding:7px 9px;font-size:12px;font-weight:800;margin-top:8px;display:none}
+.lp-warn.show{display:block}
 /* assembly labels */
 #asmL{position:fixed;inset:0;pointer-events:none;z-index:5}
 .plab{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;opacity:0;transition:opacity .35s}
@@ -298,10 +322,25 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
     <button class="chip shadow" data-open="team" style="--c:var(--red)"><i></i><span class="lbl">Équipe</span></button>
     <button class="chip shadow" data-open="atelier" style="--c:var(--violet)"><i></i><span class="lbl">Atelier</span></button>
     <button class="chip shadow" id="tourChip" style="--c:var(--orange)" title="Mode présentation (touche P)"><i></i><span class="lbl">Présenter</span></button>
+    <button class="chip shadow" id="realChip" style="--c:var(--green)" title="Relier la vraie voiture (manette en USB)"><i></i><span class="lbl">Vraie voiture</span></button>
     <button class="chip icon shadow" id="sndBtn" aria-label="Couper le son">🔊</button>
   </nav>
 </div>
 
+<div class="linkpanel shadow" id="linkPanel" role="region" aria-label="Vraie voiture">
+  <div class="lp-h"><b>Vraie voiture</b><button id="lpX" aria-label="Fermer">✕</button></div>
+  <p class="lp-st" id="lpSt"><i></i><span id="lpStTxt">Manette non connectée</span></p>
+  <button class="btn blue" id="lpConn">Connecter la manette (USB)</button>
+  <div class="lp-modes">
+    <button data-lm="mirror" disabled>Miroir<small>manette → 3D</small></button>
+    <button data-lm="pilot" disabled>Pilote<small>site → voiture</small></button>
+  </div>
+  <label class="lp-sp">Vitesse max <input type="range" id="lpMax" min="30" max="100" step="5" value="40"><b id="lpMaxV">40 %</b></label>
+  <div class="lp-live"><span>ANGLE<b id="lpA">–</b></span><span>VITESSE<b id="lpV">–</b></span><span>SOURCE<b id="lpS">–</b></span></div>
+  <button class="lp-stop" id="lpStop">STOP (X)</button>
+  <div class="lp-warn" id="lpWarn">Les joysticks de la manette ont la priorité.</div>
+  <p class="lp-note" id="lpNote">Branchez la manette en USB. Chrome ou Edge sur ordinateur. Les vrais joysticks sont toujours prioritaires ; si le site se tait 0,3 s, la voiture s'arrête.</p>
+</div>
 <div class="ui lcdbox shadow">
   <div class="lcd" aria-hidden="true">
     <span class="row">DIR    | GAZ</span>
@@ -766,6 +805,7 @@ function step(now){
     autoT+=dt;const tx=ball.x+ (ball.x<FX-6?-3:0),tz=ball.z;const want=Math.atan2(tx-car.x,tz-car.z);
     let d=want-car.h;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;str=Math.max(-1,Math.min(1,d*1.6));thr=.75;bst=false;
   }
+  if(LINK.mode==='mirror'&&LINK.fresh()){thr=LINK.t;str=LINK.s;bst=false;}
   if(!playing&&G.mode==='play'){thr=0;str=0;bst=false;}
   if(!G.cut&&now-lastSend>50){lastSend=now;car.cmdT=thr;car.cmdS=str;car.cmdB=bst;G.lastPacket=now;}
   const silent=now-(G.lastPacket||now);
@@ -1199,5 +1239,64 @@ addEventListener('keydown',e=>{
   if((k==='p'||k==='P')&&!e.repeat){e.preventDefault();e.stopImmediatePropagation();startTour();}
 },true);
 (function(){const c=$('qrCv');drawQR(c.getContext('2d'),0,0,330);})();
-window.__nitro={G,car,ball,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB,startTour,endTour,tourStep,startAssembly,ASM};
+/* ======================================================================
+   VRAIE VOITURE — lien USB avec la manette (Web Serial)
+   manette -> site : "N,angle,vitesse,source"   (source M = joysticks, W = site)
+   site -> manette : "W,angle,vitesse"          (20 fois par seconde en mode Pilote)
+   ====================================================================== */
+const LINK={port:null,writer:null,mode:'off',ang:90,pwm:0,src:'-',last:0,t:0,s:0,busy:false,
+  fresh(){return performance.now()-this.last<500;}};
+function lpSet(on,txt){$('lpSt').classList.toggle('on',on);$('lpStTxt').textContent=txt;document.querySelectorAll('[data-lm]').forEach(b=>b.disabled=!on);$('lpConn').textContent=on?'Déconnecter':'Connecter la manette (USB)';}
+function lpMode(m){
+  LINK.mode=m;document.querySelectorAll('[data-lm]').forEach(b=>b.classList.toggle('on',b.dataset.lm===m));
+  if(m!=='off'){
+    if($('intro'))$('intro').remove();if(tourI>=0)endTour();document.querySelectorAll('.btn.ui').forEach(b=>b.remove());
+    if(sheetOpen)closeSheet();if(G.mode!=='play'){$('touch').classList.toggle('show',touchDev&&m==='pilot');G.boost=33;kickoff();}
+    toast(m==='mirror'?'Mode Miroir : bougez les vrais joysticks':'Mode Pilote : conduisez au clavier, la vraie voiture suit');
+  }
+}
+function linkLine(line){
+  if(!line.startsWith('N,'))return;const p=line.split(',');if(p.length<4)return;
+  const a=parseInt(p[1],10),v=parseInt(p[2],10);if(isNaN(a)||isNaN(v))return;
+  LINK.ang=a;LINK.pwm=v;LINK.src=p[3].trim();LINK.last=performance.now();
+  LINK.s=Math.max(-1,Math.min(1,(90-a)/45));LINK.t=Math.max(-1,Math.min(1,v/255));
+  $('lpA').textContent=a+'°';$('lpV').textContent=v;$('lpS').textContent=LINK.src==='W'?'site':'manette';
+  $('lpWarn').classList.toggle('show',LINK.mode==='pilot'&&LINK.src==='M'&&(a!==90||v!==0));
+}
+async function linkConnect(){
+  if(LINK.port){await linkClose();return;}
+  if(!('serial' in navigator)){toast('Le lien USB marche dans Chrome ou Edge sur ordinateur (lien GitHub du site).');$('lpNote').textContent='Ce navigateur ne permet pas le lien USB : ouvrez medouaishamdi.github.io/nitro dans Chrome ou Edge sur ordinateur.';return;}
+  let port;try{port=await navigator.serial.requestPort();}catch(e){return;}
+  try{await port.open({baudRate:115200});}catch(e){toast('Impossible d\'ouvrir le port : fermez le Moniteur série d\'Arduino IDE.');return;}
+  LINK.port=port;lpSet(true,'Manette connectée');
+  const enc=new TextEncoderStream();enc.readable.pipeTo(port.writable).catch(()=>{});LINK.writer=enc.writable.getWriter();
+  const dec=new TextDecoderStream();port.readable.pipeTo(dec.writable).catch(()=>{});const reader=dec.readable.getReader();LINK.reader=reader;
+  (async()=>{let buf='';try{while(true){const {value,done}=await reader.read();if(done)break;buf+=value;let i;while((i=buf.indexOf('\n'))>=0){linkLine(buf.slice(0,i).trim());buf=buf.slice(i+1);}if(buf.length>400)buf='';}}catch(e){}if(LINK.port)linkClose(true);})();
+}
+async function linkClose(lost){
+  const port=LINK.port;LINK.port=null;lpMode('off');
+  try{if(LINK.writer){await LINK.writer.write('W,90,0\n').catch(()=>{});LINK.writer.releaseLock();}}catch(e){}
+  try{if(LINK.reader){await LINK.reader.cancel();}}catch(e){}
+  try{await port.close();}catch(e){}
+  LINK.writer=null;LINK.reader=null;lpSet(false,lost?'Manette débranchée':'Manette non connectée');['lpA','lpV','lpS'].forEach(id=>$(id).textContent='–');
+}
+function linkStop(){if(LINK.mode!=='off'){lpMode('off');toast('STOP : la vraie voiture s\'arrête');}if(LINK.writer)LINK.writer.write('W,90,0\n').catch(()=>{});}
+setInterval(()=>{
+  if(!LINK.writer||LINK.mode!=='pilot'||LINK.busy)return;
+  let a=90,v=0;
+  if(G.mode==='play'&&!sheetOpen&&!G.frozen&&!document.hidden){
+    const max=Math.max(70,Math.round(255*$('lpMax').value/100)),t=car.inT,sx=car.inS;
+    a=Math.round(90-sx*45);v=t===0?0:Math.sign(t)*Math.round(70+(max-70)*Math.min(1,Math.abs(t)));
+  }
+  LINK.busy=true;LINK.writer.write('W,'+a+','+v+'\n').catch(()=>{}).finally(()=>{LINK.busy=false;});
+},50);
+$('realChip').onclick=()=>$('linkPanel').classList.toggle('open');
+$('lpX').onclick=()=>$('linkPanel').classList.remove('open');
+$('lpConn').onclick=linkConnect;$('lpStop').onclick=linkStop;
+document.querySelectorAll('[data-lm]').forEach(b=>b.onclick=()=>lpMode(LINK.mode===b.dataset.lm?'off':b.dataset.lm));
+$('lpMax').oninput=e=>{$('lpMaxV').textContent=e.target.value+' %';};
+addEventListener('keydown',e=>{if((e.key==='x'||e.key==='X')&&LINK.mode!=='off'&&!/INPUT|SELECT|TEXTAREA/.test((e.target&&e.target.tagName)||'')){linkStop();}},true);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&LINK.mode==='pilot'&&LINK.writer)LINK.writer.write('W,90,0\n').catch(()=>{});});
+if('serial' in navigator)navigator.serial.addEventListener('disconnect',e=>{if(LINK.port&&e.target===LINK.port)linkClose(true);});
+window.__nitro={G,car,ball,LINK,linkLine,lpMode,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB,startTour,endTour,tourStep,startAssembly,ASM};
 </script>
