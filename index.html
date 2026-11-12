@@ -299,6 +299,42 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
 .pf.back li{display:flex;gap:7px;align-items:flex-start;font-size:12px;font-weight:700;line-height:1.3;margin:6px 0}
 .pf.back li i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:3px;background:var(--d)}
 .pf.back p{font-size:12px;font-weight:700;color:var(--muted);line-height:1.4;margin:0}
+/* ===== LABO : 5 nouvelles façons de piloter ===== */
+.labpanel{position:fixed;z-index:12;right:max(14px,env(safe-area-inset-right,0px));top:calc(78px + env(safe-area-inset-top,0px));width:340px;max-width:calc(100vw - 28px);max-height:calc(100vh - 100px);overflow:auto;background:var(--paper);border-radius:18px;padding:14px 14px 12px;display:none}
+.labpanel.open{display:block}
+.lab-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:4px 0 12px}
+.lab-tabs button{background:var(--mist);border-radius:11px;padding:7px 2px 6px;font-weight:900;font-size:11px;color:var(--ink);border:2px solid transparent;line-height:1.15}
+.lab-tabs button span{display:block;font-size:19px;margin-bottom:2px}
+.lab-tabs button.on{border-color:var(--violet);background:#f3efff}
+.lab-sec{display:none}.lab-sec.on{display:block}
+.lab-sec h4{margin:0 0 4px;font-family:var(--display);font-weight:400;font-size:17px}
+.lab-sec p{font-size:12.5px;color:var(--muted);margin:0 0 9px;line-height:1.4}
+.lab-sec .btn{width:100%;font-size:14.5px;padding:10px 12px;margin-bottom:8px}
+.lab-row{display:flex;gap:6px;margin-bottom:8px}.lab-row .btn{margin:0}
+.lab-st{font-size:12.5px;font-weight:800;color:var(--ink);background:var(--mist);border-radius:10px;padding:8px 10px;margin-bottom:8px;min-height:18px}
+.lab-big{font-family:var(--display);font-size:22px;color:var(--violet);text-align:center;margin:4px 0 8px;min-height:28px}
+.lab-cmds{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.lab-cmds b{background:#f3efff;color:#4b33c9;border-radius:8px;padding:3px 7px;font-size:11.5px}
+.lab-cv{width:100%;aspect-ratio:4/3;background:#10213b;border-radius:12px;display:block;margin-bottom:8px}
+.lab-list{list-style:none;margin:0 0 8px;padding:0;max-height:190px;overflow:auto}
+.lab-list li{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;background:var(--mist);margin-bottom:5px;font-size:12.5px;font-weight:800}
+.lab-list li span{flex:1;min-width:0}.lab-list li small{display:block;color:var(--muted);font-weight:700;font-size:11px}
+.lab-list li button{background:#fff;border-radius:8px;padding:5px 8px;font-weight:900;font-size:12px}
+.lab-list li.gold{background:#fff6d6}
+.lab-stop{width:100%;background:var(--red);color:#fff;font-family:var(--display);font-size:16px;border-radius:12px;padding:9px;margin-top:4px}
+.lab-note{font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.4}
+.lab-in{width:100%;border:2px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-weight:800;margin-bottom:8px}
+.rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--red);margin-right:6px;animation:blink .8s steps(2) infinite}
+.racehud{position:fixed;z-index:6;left:50%;transform:translateX(-50%);top:calc(70px + env(safe-area-inset-top,0px));background:rgba(16,33,59,.88);color:#fff;border-radius:14px;padding:8px 16px;font-family:var(--display);font-size:18px;display:none;gap:16px;align-items:center;white-space:nowrap;pointer-events:none}
+.racehud.show{display:flex}.racehud small{display:block;font-size:10px;color:var(--volt);letter-spacing:.06em}
+.racehud .rt{font-size:26px;min-width:96px}
+.drawbox{position:fixed;inset:0;z-index:30;background:rgba(16,33,59,.75);display:none;place-items:center;padding:16px}
+.drawbox.open{display:grid}
+.drawcard{background:var(--paper);border-radius:20px;padding:14px;width:min(920px,100%,calc((100vh - 200px) * 1.56 + 28px))}
+.drawcard h3{margin:0 0 4px;font-family:var(--display);font-weight:400;font-size:22px}
+.drawcard p{margin:0 0 10px;color:var(--muted);font-size:13px}
+#drawCv{width:100%;aspect-ratio:64/41;display:block;border-radius:14px;background:#2f9e4f;touch-action:none;cursor:crosshair}
+.drawcard .lab-row{margin:10px 0 0}
 </style>
 
 <canvas id="game" aria-label="Stade NITRO Arena en 3D : une voiture radiocommandée pousse un ballon vers deux buts"></canvas>
@@ -323,6 +359,7 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
     <button class="chip shadow" data-open="atelier" style="--c:var(--violet)"><i></i><span class="lbl">Atelier</span></button>
     <button class="chip shadow" id="tourChip" style="--c:var(--orange)" title="Mode présentation (touche P)"><i></i><span class="lbl">Présenter</span></button>
     <button class="chip shadow" id="realChip" style="--c:var(--green)" title="Relier la vraie voiture (manette en USB)"><i></i><span class="lbl">Vraie voiture</span></button>
+    <button class="chip shadow" id="labChip" style="--c:var(--violet)" title="Labo : voix, main, fantôme, tracé, course"><i></i><span class="lbl">Labo</span></button>
     <button class="chip icon shadow" id="sndBtn" aria-label="Couper le son">🔊</button>
   </nav>
 </div>
@@ -340,6 +377,76 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
   <button class="lp-stop" id="lpStop">STOP (X)</button>
   <div class="lp-warn" id="lpWarn">Les joysticks de la manette ont la priorité.</div>
   <p class="lp-note" id="lpNote">Branchez la manette en USB. Chrome ou Edge sur ordinateur. Les vrais joysticks sont toujours prioritaires ; si le site se tait 0,3 s, la voiture s'arrête.</p>
+</div>
+<div class="labpanel shadow" id="labPanel" role="region" aria-label="Labo de pilotage">
+  <div class="lp-h"><b>Labo · nouveaux pilotages</b><button id="labX" aria-label="Fermer">✕</button></div>
+  <div class="lab-tabs" role="tablist">
+    <button data-lt="voice" class="on"><span>🎙️</span>Voix</button>
+    <button data-lt="hand"><span>✋</span>Main</button>
+    <button data-lt="ghost"><span>👻</span>Fantôme</button>
+    <button data-lt="path"><span>✏️</span>Tracé</button>
+    <button data-lt="race"><span>🏁</span>Course</button>
+  </div>
+
+  <section class="lab-sec on" data-ls="voice">
+    <h4>Pilotage à la voix</h4>
+    <p>Parlez en français, la voiture obéit. Chrome ou Edge, micro autorisé.</p>
+    <button class="btn" id="vcBtn">🎙️ Activer la voix</button>
+    <div class="lab-big" id="vcCmd">–</div>
+    <div class="lab-st" id="vcHeard">Entendu : –</div>
+    <div class="lab-cmds"><b>avance</b><b>recule</b><b>gauche</b><b>droite</b><b>tout droit</b><b>plus vite</b><b>doucement</b><b>demi-tour</b><b>klaxon</b><b>stop</b></div>
+  </section>
+
+  <section class="lab-sec" data-ls="hand">
+    <h4>Pilotage à la main (IA)</h4>
+    <p>Une IA de vision (MediaPipe) suit votre main avec la webcam. Main en haut : avance · en bas : recule · à gauche / à droite : tourne · poing fermé : stop.</p>
+    <button class="btn" id="hdBtn">✋ Activer la caméra</button>
+    <canvas class="lab-cv" id="hdCv" width="320" height="240"></canvas>
+    <div class="lab-st" id="hdSt">Caméra éteinte</div>
+  </section>
+
+  <section class="lab-sec" data-ls="ghost">
+    <h4>Enregistrer et rejouer</h4>
+    <p>Enregistrez un parcours (clavier, voix, main ou vrais joysticks en mode Miroir), puis rejouez-le : la voiture le refait toute seule.</p>
+    <button class="btn" id="recBtn">⏺ Enregistrer un parcours</button>
+    <div class="lab-st" id="recSt">Base de parcours : –</div>
+    <ul class="lab-list" id="runList"></ul>
+    <div class="lab-row"><button class="btn blue" id="runExp" style="font-size:13px">Exporter (JSON)</button><button class="btn blue" id="runImp" style="font-size:13px">Importer</button></div>
+    <input type="file" id="runFile" accept=".json,application/json" hidden>
+  </section>
+
+  <section class="lab-sec" data-ls="path">
+    <h4>Dessiner un trajet</h4>
+    <p>Dessinez une route vue du ciel : la voiture la suit toute seule. Faites des courbes larges (la voiture ne tourne pas sur place).</p>
+    <button class="btn" id="pathBtn">✏️ Dessiner un trajet</button>
+    <div class="lab-st" id="pathSt">Aucun trajet</div>
+  </section>
+
+  <section class="lab-sec" data-ls="race">
+    <h4>Mode course</h4>
+    <p>Passez les portes A → B → C puis la ligne d'arrivée. Chrono, classement et fantôme du meilleur tour.</p>
+    <input class="lab-in" id="raceName" maxlength="14" placeholder="Nom du pilote" value="Pilote">
+    <button class="btn" id="raceBtn">🏁 Lancer la course</button>
+    <ul class="lab-list" id="raceList"></ul>
+    <button class="btn blue" id="raceClr" style="font-size:13px">Effacer le classement</button>
+  </section>
+
+  <button class="lab-stop" id="labStopBtn">STOP</button>
+  <p class="lab-note">Tout marche sans la voiture (voiture 3D). Pour piloter la vraie voiture : <b>Vraie voiture → Pilote</b>, puis utilisez le Labo. Les touches du clavier gardent toujours la priorité.</p>
+</div>
+<div class="racehud" id="raceHud" aria-live="polite">
+  <div><small>TOUR</small><span id="rhLap">1</span></div>
+  <div class="rt"><small>CHRONO</small><span id="rhT">0:00.00</span></div>
+  <div><small>MEILLEUR</small><span id="rhBest">–</span></div>
+  <div><small>PROCHAIN</small><span id="rhNext">A</span></div>
+</div>
+<div class="drawbox" id="drawBox" role="dialog" aria-label="Dessiner un trajet">
+  <div class="drawcard shadow">
+    <h3>Dessinez le trajet</h3>
+    <p>Partez de la voiture (flèche blanche) et dessinez avec la souris ou le doigt.</p>
+    <canvas id="drawCv" width="1280" height="820"></canvas>
+    <div class="lab-row"><button class="btn blue" id="drawClr">Effacer</button><button class="btn blue" id="drawCancel">Annuler</button><button class="btn" id="drawGo">▶ Lancer</button></div>
+  </div>
 </div>
 <div class="ui lcdbox shadow">
   <div class="lcd" aria-hidden="true">
@@ -798,6 +905,7 @@ function step(now){
   let dt=Math.min(.05,(now-last)/1000);last=now;
   if(G.slowmo>0){G.slowmo-=dt;dt*=.35;}
   const playing=G.mode==='play'&&!sheetOpen&&!G.frozen;
+  labTick(dt,now);
   // inputs → radio packets at 20 Hz → failsafe after 0.5 s of silence
   let thr=car.inT,str=car.inS,bst=car.boosting;
   if(G.mode==='tour'){thr=0;str=0;bst=false;}
@@ -824,7 +932,7 @@ function step(now){
   if(Math.abs(car.z)>cz){car.z=Math.sign(car.z)*cz;car.speed*=-.25;sfx.wall();}
   G.bat=Math.max(6.6,G.bat-Math.abs(car.speed)*dt*.0002);
   // ball physics
-  if(!G.frozen||G.mode!=='play'){
+  if(!RACE.on&&(!G.frozen||G.mode!=='play')){
     ball.vy-=30*dt;ball.x+=ball.vx*dt;ball.z+=ball.vz*dt;ball.y+=ball.vy*dt;
     if(ball.y<ball.r){ball.y=ball.r;if(Math.abs(ball.vy)>2)ball.vy*=-.55;else ball.vy=0;}
     const fr=Math.pow(.55,dt);ball.vx*=fr;ball.vz*=fr;
@@ -853,7 +961,7 @@ function step(now){
     if(!b.ready){b.t-=dt;if(b.t<=0){b.ready=true;b.orb.visible=true;}}
     else if(Math.hypot(car.x-b.x,car.z-b.z)<2.2&&G.mode==='play'){b.ready=false;b.t=5;b.orb.visible=false;G.boost=Math.min(100,G.boost+40);sfx.boostPad();}}
   // clock
-  if(G.mode==='play'&&!G.frozen&&!sheetOpen&&!G.goalLock&&G.clock>0){G.clock-=dt;if(G.clock<=0){G.clock=0;endMatch();}}
+  if(G.mode==='play'&&!G.frozen&&!sheetOpen&&!G.goalLock&&G.clock>0&&!labBusy()){G.clock-=dt;if(G.clock<=0){G.clock=0;endMatch();}}
   updScore();
   // render state
   if(THREE_OK){
@@ -1315,5 +1423,351 @@ $('lpMax').oninput=e=>{$('lpMaxV').textContent=e.target.value+' %';};
 addEventListener('keydown',e=>{if((e.key==='x'||e.key==='X')&&LINK.mode!=='off'&&!/INPUT|SELECT|TEXTAREA/.test((e.target&&e.target.tagName)||'')){linkStop();}},true);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&LINK.mode==='pilot')linkSend('W,90,0\n');});
 if('serial' in navigator)navigator.serial.addEventListener('disconnect',e=>{if(LINK.port&&e.target===LINK.port)linkClose(true);});
-window.__nitro={G,car,ball,LINK,linkLine,lpMode,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB,startTour,endTour,tourStep,startAssembly,ASM};
+/* ======================================================================
+   LABO — 5 nouvelles façons de piloter : voix, main (IA), fantôme,
+   tracé dessiné, mode course.
+   Chaque mode produit une consigne (gaz LAB.t, direction LAB.s, de -1 à 1)
+   copiée dans car.inT / car.inS : la voiture 3D la suit, et en mode
+   Pilote le site envoie la même consigne à la vraie voiture.
+   ====================================================================== */
+const LAB={src:null,t:0,s:0};
+const REC={on:false,cmd:[],pos:[],last:0,start:null};
+const RACE={on:false,next:0,lap:1,lapStart:0,best:null,samples:[],lastS:0,ghost:null,ghostMesh:null,grp:null,gates:[],cones:[]};
+const PATH={pts:[],i:0,line:null};
+const REP={run:null,acc:0,line:null};
+const DRIVE_KEYS=['arrowup','arrowdown','arrowleft','arrowright','z','q','s','d','w','a'];
+function drivingKeys(){for(const k of DRIVE_KEYS)if(keys.has(k))return true;return false;}
+function labBusy(){return !!LAB.src||RACE.on||REC.on;}
+function labEnsurePlay(){
+  if($('intro'))$('intro').remove();if(tourI>=0)endTour();document.querySelectorAll('.btn.ui').forEach(b=>b.remove());
+  if(sheetOpen)closeSheet();if(G.mode!=='play'){G.boost=33;kickoff();return true;}return false;
+}
+function labStart(src){if(LAB.src&&LAB.src!==src)labStop(true);LAB.src=src;LAB.t=0;LAB.s=0;}
+function labStop(quiet){
+  const was=LAB.src;LAB.src=null;LAB.t=0;LAB.s=0;car.inT=0;car.inS=0;readKeys();
+  if(was==='voice')voiceStop();if(was==='hand')handStop();
+  if(was==='replay'){REP.run=null;labLine('rep',null);renderRuns();}
+  if(was==='path'){PATH.pts=[];labLine('path',null);$('pathSt').textContent='Trajet arrêté';}
+  if(!quiet&&was)toast('Labo : arrêt');
+}
+// appelé à chaque image depuis step(), avant la physique
+function labTick(dt,now){
+  const run=G.mode==='play'&&!G.frozen&&!sheetOpen;
+  if(REC.on&&run)recTick(now);
+  if(RACE.on)raceTick(dt,now,run);
+  if(!LAB.src)return;
+  if(LAB.src==='voice')voiceTick(now);
+  else if(LAB.src==='replay'&&run)replayTick(dt);
+  else if(LAB.src==='path'&&run)pathTick(dt);
+  if(!drivingKeys()){car.inT=run?LAB.t:0;car.inS=run?LAB.s:0;}
+}
+const clamp1=v=>Math.max(-1,Math.min(1,v));
+function angDiff(a,b){let d=a-b;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;return d;}
+// ligne 3D posée au sol (trajet, fantôme…)
+const LINES={};
+function labLine(id,pts,col){
+  if(!THREE_OK)return;if(LINES[id]){scene.remove(LINES[id]);LINES[id].geometry.dispose();LINES[id]=null;}
+  if(!pts||pts.length<2)return;
+  const g=new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(p.x,.08,p.z)));
+  LINES[id]=new THREE.Line(g,new THREE.LineBasicMaterial({color:col||0x7a5cff,linewidth:3}));scene.add(LINES[id]);
+}
+
+/* ---------------- 1. VOIX ---------------- */
+const VOICE={rec:null,on:false,sUntil:0,done:new Set()};
+const V_CMDS=[
+  ['stop',/\b(stop|stoppe|stopper|arrete|arreter|arret|halte|freine|pause)\b/g,'⏹ STOP'],
+  ['recule',/\b(recule|reculer|reculez|arriere)\b/g,'⬇️ RECULE'],
+  ['vite',/\b(vite|turbo|fonce|a fond|accelere)\b/g,'⏩ PLUS VITE'],
+  ['doux',/\b(doucement|lentement|ralenti|ralentis|moins vite)\b/g,'🐢 DOUCEMENT'],
+  ['avance',/\b(avance|avancer|avancez|en avant|go|vas y|allez|demarre|roule)\b/g,'⬆️ AVANCE'],
+  ['centre',/\b(tout droit|centre|droit devant)\b/g,'⬆️ TOUT DROIT'],
+  ['gauche',/\bgauche\b/g,'⬅️ GAUCHE'],
+  ['droite',/\bdroite\b/g,'➡️ DROITE'],
+  ['demi',/\bdemi tour\b/g,'↩️ DEMI-TOUR'],
+  ['klaxon',/\b(klaxon|klaxonne|pouet)\b/g,'📯 KLAXON']];
+function vNorm(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[-'’.,!?]/g,' ').replace(/\s+/g,' ');}
+function vLast(txt){let best=null;
+  for(const [name,re,label] of V_CMDS){re.lastIndex=0;let m;while((m=re.exec(txt))){const end=m.index+m[0].length;
+    if(!best||end>best.end||(end===best.end&&m[0].length>best.len))best={name,label,end,len:m[0].length,pos:m.index};}}
+  return best;}
+function voiceApply(c){
+  const now=performance.now();
+  switch(c.name){
+    case 'stop':LAB.t=0;LAB.s=0;VOICE.sUntil=0;break;
+    case 'avance':LAB.t=.6;break;
+    case 'recule':LAB.t=-.6;break;
+    case 'vite':LAB.t=LAB.t<0?-1:1;break;
+    case 'doux':LAB.t=LAB.t<0?-.35:.35;break;
+    case 'centre':LAB.s=0;VOICE.sUntil=0;break;
+    case 'gauche':LAB.s=1;VOICE.sUntil=now+1100;break;
+    case 'droite':LAB.s=-1;VOICE.sUntil=now+1100;break;
+    case 'demi':LAB.s=1;VOICE.sUntil=now+3200;if(LAB.t<=0)LAB.t=.5;break;
+    case 'klaxon':sfx.klaxon();break;
+  }
+  $('vcCmd').textContent=c.label;$('vcCmd').animate([{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:250});
+}
+function voiceTick(now){if(VOICE.sUntil&&now>VOICE.sUntil){VOICE.sUntil=0;LAB.s=0;}}
+function voiceStart(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){$('vcHeard').textContent='Reconnaissance vocale indisponible : utilisez Chrome ou Edge sur ordinateur.';return;}
+  labStart('voice');labEnsurePlay();
+  const r=new SR();r.lang='fr-FR';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
+  VOICE.rec=r;VOICE.on=true;VOICE.done=new Set();
+  r.onresult=e=>{
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const txt=e.results[i][0].transcript;$('vcHeard').textContent='Entendu : « '+txt.trim()+' »';
+      const c=vLast(vNorm(txt));if(!c)continue;
+      const sig=i+':'+c.name+':'+c.pos;if(VOICE.done.has(sig))continue;VOICE.done.add(sig);voiceApply(c);
+    }
+  };
+  r.onerror=e=>{
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){$('vcHeard').textContent='Micro refusé : autorisez le micro (icône à gauche de l\'adresse).';labStop(true);}
+    else if(e.error==='network'){$('vcHeard').textContent='La reconnaissance vocale de Chrome a besoin d\'Internet.';}
+  };
+  r.onend=()=>{if(VOICE.on&&VOICE.rec===r){VOICE.done=new Set();setTimeout(()=>{if(VOICE.on&&VOICE.rec===r)try{r.start();}catch(e){}},120);}};
+  try{r.start();}catch(e){}
+  $('vcBtn').textContent='🔇 Couper la voix';$('vcHeard').textContent='Je vous écoute… dites « avance »';toast('🎙️ Voix activée : dites « avance »');
+}
+function voiceStop(){VOICE.on=false;if(VOICE.rec){try{VOICE.rec.abort();}catch(e){}VOICE.rec=null;}$('vcBtn').textContent='🎙️ Activer la voix';$('vcCmd').textContent='–';}
+$('vcBtn').onclick=()=>{if(LAB.src==='voice')labStop();else voiceStart();};
+
+/* ---------------- 2. MAIN (IA MediaPipe) ---------------- */
+const HAND={on:false,lm:null,video:null,stream:null,raf:0,lastT:-1,t:0,s:0,seen:0};
+const MP='https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+async function handStart(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('hdSt').textContent='Caméra indisponible dans ce navigateur.';return;}
+  labStart('hand');labEnsurePlay();HAND.on=true;$('hdBtn').textContent='⏹ Éteindre la caméra';
+  try{
+    if(!HAND.lm){
+      $('hdSt').textContent='Chargement du modèle IA (quelques secondes)…';
+      const V=await import(MP+'/vision_bundle.mjs');
+      const fs=await V.FilesetResolver.forVisionTasks(MP+'/wasm');
+      const opt=d=>({baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',delegate:d},runningMode:'VIDEO',numHands:1});
+      try{HAND.lm=await V.HandLandmarker.createFromOptions(fs,opt('GPU'));}catch(e){HAND.lm=await V.HandLandmarker.createFromOptions(fs,opt('CPU'));}
+    }
+    if(!HAND.on)return;
+    $('hdSt').textContent='Autorisez la caméra…';
+    HAND.stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false});
+    if(!HAND.on){HAND.stream.getTracks().forEach(t=>t.stop());return;}
+    const v=HAND.video||(HAND.video=document.createElement('video'));v.muted=true;v.playsInline=true;v.srcObject=HAND.stream;await v.play();
+    $('hdSt').textContent='Montrez votre main ouverte ✋';toast('✋ Main : levez la main pour avancer');
+    handLoop();
+  }catch(e){$('hdSt').textContent='Erreur : '+(e&&e.name==='NotAllowedError'?'caméra refusée.':'impossible de charger l\'IA (Internet requis).');labStop(true);}
+}
+function handStop(){HAND.on=false;cancelAnimationFrame(HAND.raf);if(HAND.stream){HAND.stream.getTracks().forEach(t=>t.stop());HAND.stream=null;}
+  $('hdBtn').textContent='✋ Activer la caméra';$('hdSt').textContent='Caméra éteinte';const g=$('hdCv').getContext('2d');g.fillStyle='#10213b';g.fillRect(0,0,320,240);}
+function handLoop(){
+  if(!HAND.on)return;HAND.raf=requestAnimationFrame(handLoop);
+  const v=HAND.video;if(!v||v.readyState<2)return;
+  let res=null;if(v.currentTime!==HAND.lastT){HAND.lastT=v.currentTime;try{res=HAND.lm.detectForVideo(v,performance.now());}catch(e){}}
+  if(!res)return;
+  const g=$('hdCv').getContext('2d'),W=320,H=240;
+  g.save();g.translate(W,0);g.scale(-1,1);g.drawImage(v,0,0,W,H);g.restore();
+  // zones
+  g.fillStyle='rgba(34,180,90,.18)';g.fillRect(0,0,W,H*.42);g.fillStyle='rgba(240,56,75,.18)';g.fillRect(0,H*.66,W,H*.34);
+  g.strokeStyle='rgba(255,255,255,.6)';g.lineWidth=1;g.setLineDash([5,5]);g.beginPath();g.moveTo(W*.42,0);g.lineTo(W*.42,H);g.moveTo(W*.58,0);g.lineTo(W*.58,H);g.stroke();g.setLineDash([]);
+  g.fillStyle='#fff';g.font='bold 12px sans-serif';g.fillText('AVANCE',8,16);g.fillText('RECULE',8,H-8);g.fillText('STOP',8,H*.55);
+  let t=0,s=0,txt='Pas de main : STOP';
+  const hand=res.landmarks&&res.landmarks[0];
+  if(hand){
+    const P=i=>({x:(1-hand[i].x)*W,y:hand[i].y*H});
+    const dist=(a,b)=>Math.hypot(hand[a].x-hand[b].x,hand[a].y-hand[b].y);
+    let open=0;for(const [tip,pip] of [[8,6],[12,10],[16,14],[20,18]])if(dist(tip,0)>dist(pip,0)*1.12)open++;
+    g.fillStyle='#ffcc29';for(let i=0;i<21;i++){const p=P(i);g.beginPath();g.arc(p.x,p.y,3,0,7);g.fill();}
+    const c=P(9);g.strokeStyle='#ff7a1a';g.lineWidth=3;g.beginPath();g.arc(c.x,c.y,12,0,7);g.stroke();
+    if(open<=1){txt='✊ Poing fermé : STOP';}
+    else{
+      const mx=c.x/W,my=c.y/H;
+      s=Math.abs(mx-.5)<.08?0:clamp1((.5-mx)/.3);
+      t=my<.42?clamp1(.35+(.42-my)/.42*.65):my>.66?-clamp1(.35+(my-.66)/.34*.65):0;
+      txt=(t>0?'⬆️ AVANCE '+Math.round(t*100)+'%':t<0?'⬇️ RECULE '+Math.round(-t*100)+'%':'⏸ STOP')+(s>.05?' · ⬅️ GAUCHE':s<-.05?' · ➡️ DROITE':'');
+    }
+  }
+  HAND.t+=(t-HAND.t)*.35;HAND.s+=(s-HAND.s)*.35;if(Math.abs(HAND.t)<.05)HAND.t=0;if(Math.abs(HAND.s)<.05)HAND.s=0;
+  if(!hand||t===0)HAND.t=t;
+  LAB.t=HAND.t;LAB.s=HAND.s;$('hdSt').textContent=txt;
+}
+$('hdBtn').onclick=()=>{if(LAB.src==='hand')labStop();else handStart();};
+
+/* ---------------- 3. FANTÔME : enregistrer / rejouer ---------------- */
+const RUNS_KEY='nitro_runs_v1';
+let RUNS=[];try{RUNS=JSON.parse(localStorage.getItem(RUNS_KEY)||'[]')||[];}catch(e){RUNS=[];}
+function saveRuns(){try{localStorage.setItem(RUNS_KEY,JSON.stringify(RUNS));}catch(e){toast('Mémoire du navigateur pleine : exportez puis supprimez des parcours');}}
+function recTick(now){
+  if(now-REC.last<50)return;REC.last=now;
+  if(!REC.start)REC.start={x:+car.x.toFixed(2),z:+car.z.toFixed(2),h:+car.h.toFixed(3)};
+  REC.cmd.push([+car.cmdT.toFixed(3),+car.cmdS.toFixed(3)]);REC.pos.push([+car.x.toFixed(2),+car.z.toFixed(2)]);
+  if(REC.cmd.length%20===0)$('recSt').innerHTML='<span class="rec-dot"></span>Enregistrement… '+(REC.cmd.length/20).toFixed(0)+' s';
+  if(REC.cmd.length>=20*120)recStop();
+}
+function recStart(){if(LAB.src==='replay')labStop(true);labEnsurePlay();Object.assign(REC,{on:true,cmd:[],pos:[],last:0,start:null});
+  $('recBtn').textContent='⏹ Arrêter l\'enregistrement';$('recSt').innerHTML='<span class="rec-dot"></span>Enregistrement… conduisez !';toast('⏺ Enregistrement : conduisez');}
+function recStop(){
+  REC.on=false;$('recBtn').textContent='⏺ Enregistrer un parcours';
+  if(REC.cmd.length<20){$('recSt').textContent='Trop court (moins d\'1 s) : pas enregistré';return;}
+  let d=0;for(let i=1;i<REC.pos.length;i++)d+=Math.hypot(REC.pos[i][0]-REC.pos[i-1][0],REC.pos[i][1]-REC.pos[i-1][1]);
+  const n=(RUNS.reduce((m,r)=>Math.max(m,r.n||0),0))+1;
+  RUNS.unshift({id:Date.now(),n,name:'Parcours '+n,date:new Date().toISOString().slice(0,16).replace('T',' '),dur:+(REC.cmd.length/20).toFixed(1),dist:Math.round(d),start:REC.start,cmd:REC.cmd,pos:REC.pos});
+  RUNS=RUNS.slice(0,20);saveRuns();renderRuns();toast('💾 '+RUNS[0].name+' enregistré');
+}
+function renderRuns(){
+  $('recSt').textContent=RUNS.length?`Base de parcours : ${RUNS.length} enregistré(s)`:'Base de parcours : vide';
+  $('runList').innerHTML=RUNS.map((r,i)=>`<li${REP.run&&REP.run.id===r.id?' class="gold"':''}><span>${r.name}<small>${r.dur} s · ${r.dist} m (3D) · ${r.date}</small></span><button data-rp="${i}">${REP.run&&REP.run.id===r.id?'⏹':'▶'}</button><button data-rv="${i}">👁</button><button data-rd="${i}">🗑</button></li>`).join('');
+}
+function replayStart(r){
+  if(REC.on)recStop();labStart('replay');labEnsurePlay();
+  car.x=r.start.x;car.z=r.start.z;car.h=r.start.h;car.speed=0;car.steer=0;
+  REP.run=r;REP.acc=0;labLine('rep',r.pos.map(p=>({x:p[0],z:p[1]})),0x7a5cff);renderRuns();toast('👻 Replay : '+r.name);
+}
+function replayTick(dt){
+  const r=REP.run;if(!r)return labStop(true);
+  REP.acc+=dt;const i=Math.floor(REP.acc/.05);
+  if(i>=r.cmd.length){labStop(true);toast('👻 Replay terminé');return;}
+  LAB.t=r.cmd[i][0];LAB.s=r.cmd[i][1];
+}
+$('recBtn').onclick=()=>{if(REC.on)recStop();else recStart();};
+$('runList').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.rp!=null){const r=RUNS[+b.dataset.rp];if(REP.run&&REP.run.id===r.id)labStop();else replayStart(r);}
+  else if(b.dataset.rv!=null){const r=RUNS[+b.dataset.rv];labLine('rep',r.pos.map(p=>({x:p[0],z:p[1]})),0x7a5cff);toast('Tracé de « '+r.name+' » affiché');}
+  else if(b.dataset.rd!=null){const i=+b.dataset.rd;if(REP.run&&REP.run.id===RUNS[i].id)labStop(true);RUNS.splice(i,1);saveRuns();renderRuns();labLine('rep',null);}};
+$('runExp').onclick=()=>{const blob=new Blob([JSON.stringify({app:'NITRO',type:'parcours',runs:RUNS},null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nitro-parcours.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);};
+$('runImp').onclick=()=>$('runFile').click();
+$('runFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());const list=(j.runs||[]).filter(r=>r&&r.cmd&&r.pos&&r.start);
+  const ids=new Set(RUNS.map(r=>r.id));list.forEach(r=>{if(!ids.has(r.id))RUNS.push(r);});RUNS=RUNS.slice(0,40);saveRuns();renderRuns();toast(list.length+' parcours importé(s)');}catch(err){toast('Fichier invalide');}e.target.value='';};
+renderRuns();
+
+/* ---------------- 4. TRACÉ DESSINÉ ---------------- */
+const DRAW={pts:[],down:false,start:null};
+function dcv(){return $('drawCv');}
+function w2c(x,z){const c=dcv();return {x:(x/FX+1)/2*c.width,y:(z/FZ+1)/2*c.height};}
+function c2w(px,py){const c=dcv();return {x:(px/c.width*2-1)*FX,z:(py/c.height*2-1)*FZ};}
+function drawRender(){
+  const c=dcv(),g=c.getContext('2d'),W=c.width,H=c.height;
+  g.fillStyle='#2f9e4f';g.fillRect(0,0,W,H);
+  for(let i=0;i<10;i++){g.fillStyle=i%2?'#2c9449':'#33a654';g.fillRect(i*W/10,0,W/10,H);}
+  g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=4;g.strokeRect(6,6,W-12,H-12);g.beginPath();g.moveTo(W/2,0);g.lineTo(W/2,H);g.stroke();
+  g.beginPath();g.arc(W/2,H/2,H*.18,0,7);g.stroke();
+  const gz=GOALW/FZ*H/2;g.fillStyle='#1f7cff';g.fillRect(0,H/2-gz,14,gz*2);g.fillStyle='#ff7a1a';g.fillRect(W-14,H/2-gz,14,gz*2);
+  if(DRAW.pts.length>1){g.strokeStyle='#ffcc29';g.lineWidth=10;g.lineCap=g.lineJoin='round';g.beginPath();DRAW.pts.forEach((p,i)=>{const q=w2c(p.x,p.z);i?g.lineTo(q.x,q.y):g.moveTo(q.x,q.y);});g.stroke();
+    const e=w2c(DRAW.pts[DRAW.pts.length-1].x,DRAW.pts[DRAW.pts.length-1].z);g.fillStyle='#f0384b';g.beginPath();g.arc(e.x,e.y,14,0,7);g.fill();}
+  const s=DRAW.start,q=w2c(s.x,s.z);g.save();g.translate(q.x,q.y);g.rotate(-Math.atan2(Math.cos(s.h),Math.sin(s.h)));
+  g.fillStyle='#fff';g.strokeStyle='#10213b';g.lineWidth=4;g.beginPath();g.moveTo(26,0);g.lineTo(-16,-16);g.lineTo(-8,0);g.lineTo(-16,16);g.closePath();g.fill();g.stroke();g.restore();
+}
+function drawOpen(){
+  DRAW.start=G.mode==='play'?{x:car.x,z:car.z,h:car.h}:{x:-14,z:0,h:Math.PI/2};
+  DRAW.pts=[{x:DRAW.start.x,z:DRAW.start.z}];$('drawBox').classList.add('open');drawRender();
+}
+function drawPt(e){const c=dcv(),r=c.getBoundingClientRect();const w=c2w((e.clientX-r.left)/r.width*c.width,(e.clientY-r.top)/r.height*c.height);
+  w.x=Math.max(-FX+2.5,Math.min(FX-2.5,w.x));w.z=Math.max(-FZ+2.5,Math.min(FZ-2.5,w.z));
+  const l=DRAW.pts[DRAW.pts.length-1];if(Math.hypot(w.x-l.x,w.z-l.z)>1.2){DRAW.pts.push(w);drawRender();}}
+dcv().addEventListener('pointerdown',e=>{DRAW.down=true;dcv().setPointerCapture(e.pointerId);if(DRAW.pts.length<=1)DRAW.pts=[{x:DRAW.start.x,z:DRAW.start.z}];drawPt(e);});
+dcv().addEventListener('pointermove',e=>{if(DRAW.down)drawPt(e);});
+for(const ev of ['pointerup','pointercancel'])dcv().addEventListener(ev,()=>{DRAW.down=false;});
+$('drawClr').onclick=()=>{DRAW.pts=[{x:DRAW.start.x,z:DRAW.start.z}];drawRender();};
+$('drawCancel').onclick=()=>$('drawBox').classList.remove('open');
+$('drawGo').onclick=()=>{
+  if(DRAW.pts.length<4){toast('Dessinez un trajet plus long');return;}
+  $('drawBox').classList.remove('open');labStart('path');const fresh=labEnsurePlay();
+  if(!fresh){car.x=DRAW.start.x;car.z=DRAW.start.z;}
+  PATH.pts=DRAW.pts.slice(1);PATH.i=0;PATH.back=0;PATH.stuck=0;labLine('path',DRAW.pts,0xffcc29);
+  let d=0;for(let i=1;i<DRAW.pts.length;i++)d+=Math.hypot(DRAW.pts[i].x-DRAW.pts[i-1].x,DRAW.pts[i].z-DRAW.pts[i-1].z);
+  $('pathSt').textContent=`Trajet en cours : ${Math.round(d)} m (3D), ${PATH.pts.length} points`;toast('✏️ La voiture suit votre trajet');
+};
+function pathTick(dt){
+  const P=PATH.pts;if(!P.length)return labStop(true);
+  // bloqué contre un mur ou virage trop serré : petite marche arrière en braquant à l'opposé
+  if(PATH.back>0){PATH.back-=dt;LAB.t=-.45;LAB.s=-PATH.bs;return;}
+  if(LAB.t>0&&Math.abs(car.speed)<2.5){PATH.stuck=(PATH.stuck||0)+dt;if(PATH.stuck>.7){PATH.stuck=0;PATH.back=1.3;PATH.bs=LAB.s>=0?1:-1;return;}}else PATH.stuck=0;
+  let i=PATH.i;const D=k=>Math.hypot(P[k].x-car.x,P[k].z-car.z);
+  while(i<P.length-1&&(D(i)<3.2||D(i+1)<D(i)))i++;PATH.i=i;
+  if(i>=P.length-1&&D(P.length-1)<2.5){labStop(true);$('pathSt').textContent='🏁 Trajet terminé !';toast('🏁 Arrivé au bout du trajet');sfx.beep(true);return;}
+  let tg=P[i];for(let k=i;k<P.length;k++){tg=P[k];if(D(k)>4.5)break;}
+  const d=angDiff(Math.atan2(tg.x-car.x,tg.z-car.z),car.h);
+  LAB.s=clamp1(d*1.8);LAB.t=Math.abs(d)>1.3?.3:Math.abs(d)>.5?.42:.6;
+}
+$('pathBtn').onclick=()=>{if(LAB.src==='path')labStop();drawOpen();};
+
+/* ---------------- 10. MODE COURSE ---------------- */
+const GATES=[{n:'A',x:0,z:-13.3,ax:'z'},{n:'B',x:26,z:0,ax:'x'},{n:'C',x:0,z:13.3,ax:'z'},{n:'🏁',x:-26,z:0,ax:'x'}];
+const CONES=[-14,-7,0,7,14].map(x=>({x,z:0}));
+const RACE_KEY='nitro_race_v1',GHOST_KEY='nitro_ghost_v1';
+let BOARD=[];try{BOARD=JSON.parse(localStorage.getItem(RACE_KEY)||'[]')||[];}catch(e){BOARD=[];}
+function fmtT(s){if(s==null)return '–';const m=Math.floor(s/60),r=s-m*60;return m+':'+(r<10?'0':'')+r.toFixed(2);}
+function renderBoard(){
+  $('raceList').innerHTML=BOARD.length?BOARD.slice(0,8).map((b,i)=>`<li${i===0?' class="gold"':''}><span>${['🥇','🥈','🥉'][i]||(i+1)+'.'} ${b.name.replace(/[<>&]/g,'')}<small>${b.date}</small></span><b>${fmtT(b.time)}</b></li>`).join(''):'<li><span>Pas encore de temps : à vous !</span></li>';
+}
+function raceBuild(){
+  if(!THREE_OK)return;const grp=new THREE.Group();RACE.gates=[];
+  const post=new THREE.CylinderGeometry(.3,.3,4.2,10),ban=new THREE.BoxGeometry(9.6,1,.25);
+  GATES.forEach((gt,i)=>{
+    const m=new THREE.MeshStandardMaterial({color:i===3?0xffcc29:0xffffff,emissive:0x000000});
+    const g=new THREE.Group();g.position.set(gt.x,0,gt.z);if(gt.ax==='x')g.rotation.y=Math.PI/2;
+    for(const o of [-4.6,4.6]){const p=new THREE.Mesh(post,m);p.position.set(o,2.1,0);p.castShadow=true;g.add(p);}
+    const b=new THREE.Mesh(ban,m);b.position.y=4.2;g.add(b);
+    const cv=document.createElement('canvas');cv.width=256;cv.height=128;const x=cv.getContext('2d');x.fillStyle='#10213b';x.fillRect(0,0,256,128);x.fillStyle='#fff';x.font='bold 90px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(gt.n,128,68);
+    const lab=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),side:THREE.DoubleSide}));lab.position.set(0,5.4,0);g.add(lab);
+    grp.add(g);RACE.gates.push(m);});
+  const cm=new THREE.MeshStandardMaterial({color:0xff7a1a});const cg=new THREE.ConeGeometry(.7,1.6,14);
+  CONES.forEach(c=>{const k=new THREE.Mesh(cg,cm);k.position.set(c.x,.8,c.z);k.castShadow=true;grp.add(k);});
+  scene.add(grp);RACE.grp=grp;
+  const gh=carG.clone(true);gh.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.35;o.material.depthWrite=false;o.castShadow=false;}});
+  gh.visible=false;scene.add(gh);RACE.ghostMesh=gh;
+}
+function raceStart(){
+  if(LAB.src==='replay'||LAB.src==='path')labStop(true);
+  labEnsurePlay();if(G.mode==='play'&&!G.frozen){G.boost=33;kickoff();}
+  car.x=-26;car.z=5;car.h=Math.PI;car.speed=0;car.steer=0;
+  Object.assign(RACE,{on:true,next:0,lap:1,lapStart:0,samples:[],lastS:0});
+  try{RACE.ghost=JSON.parse(localStorage.getItem(GHOST_KEY)||'null');}catch(e){RACE.ghost=null;}
+  RACE.best=BOARD.length?BOARD[0].time:null;
+  if(THREE_OK){if(!RACE.grp)raceBuild();RACE.grp.visible=true;ballM.visible=false;ballM.userData.ring.visible=false;}
+  $('raceHud').classList.add('show');$('raceBtn').textContent='⏹ Arrêter la course';raceGateColors();
+}
+function raceStop(){
+  RACE.on=false;$('raceHud').classList.remove('show');$('raceBtn').textContent='🏁 Lancer la course';
+  if(THREE_OK&&RACE.grp){RACE.grp.visible=false;RACE.ghostMesh.visible=false;ballM.visible=true;ballM.userData.ring.visible=true;}
+  ball.x=0;ball.z=0;ball.y=6;ball.vx=ball.vz=ball.vy=0;
+}
+function raceGateColors(){RACE.gates.forEach((m,i)=>{m.emissive.setHex(i===RACE.next?0xff7a1a:0x000000);m.emissiveIntensity=i===RACE.next?.9:0;});$('rhNext').textContent=GATES[RACE.next].n;}
+function raceTick(dt,now,run){
+  // cônes : obstacles
+  for(const c of CONES){const dx=car.x-c.x,dz=car.z-c.z,d=Math.hypot(dx,dz);if(d<2.4&&d>0){car.x=c.x+dx/d*2.4;car.z=c.z+dz/d*2.4;car.speed*=.5;}}
+  if(!run){if(!RACE.lapStart)$('rhT').textContent='0:00.00';return;}
+  if(!RACE.lapStart){RACE.lapStart=now;RACE.samples=[];}
+  const t=(now-RACE.lapStart)/1000;$('rhT').textContent=fmtT(t);$('rhLap').textContent=RACE.lap;$('rhBest').textContent=fmtT(RACE.best);
+  if(now-RACE.lastS>=50){RACE.lastS=now;RACE.samples.push([+car.x.toFixed(2),+car.z.toFixed(2),+car.h.toFixed(3)]);}
+  // fantôme du meilleur tour
+  if(THREE_OK&&RACE.ghostMesh){const gs=RACE.ghost&&RACE.ghost.s;if(gs&&gs.length){const k=Math.min(gs.length-1,Math.floor(t/.05));const p=gs[k];
+    RACE.ghostMesh.visible=k<gs.length-1;RACE.ghostMesh.position.set(p[0],0,p[1]);RACE.ghostMesh.rotation.y=p[2];}else RACE.ghostMesh.visible=false;}
+  const gt=GATES[RACE.next];
+  if(Math.hypot(car.x-gt.x,car.z-gt.z)<5.5){
+    if(RACE.next<3){RACE.next++;sfx.beep(false);raceGateColors();}
+    else{
+      const lt=t;sfx.beep(true);const name=($('raceName').value||'Pilote').trim().slice(0,14)||'Pilote';
+      const rec=RACE.best==null||lt<RACE.best;
+      BOARD.push({name,time:+lt.toFixed(2),date:new Date().toISOString().slice(0,10)});BOARD.sort((a,b)=>a.time-b.time);BOARD=BOARD.slice(0,10);
+      try{localStorage.setItem(RACE_KEY,JSON.stringify(BOARD));}catch(e){}
+      if(rec){RACE.best=lt;RACE.ghost={time:lt,s:RACE.samples};try{localStorage.setItem(GHOST_KEY,JSON.stringify(RACE.ghost));}catch(e){}
+        sfx.horn();burst(car.x,true);G.cheer=2.5;toast('🏆 Nouveau record : '+fmtT(lt));}
+      else toast('Tour '+RACE.lap+' : '+fmtT(lt));
+      renderBoard();RACE.lap++;RACE.next=0;RACE.lapStart=now;RACE.samples=[];raceGateColors();
+    }
+  }
+}
+$('raceBtn').onclick=()=>{if(RACE.on)raceStop();else raceStart();};
+$('raceClr').onclick=()=>{BOARD=[];RACE.best=null;RACE.ghost=null;try{localStorage.removeItem(RACE_KEY);localStorage.removeItem(GHOST_KEY);}catch(e){}renderBoard();toast('Classement effacé');};
+renderBoard();
+
+/* ---------------- panneau ---------------- */
+$('labChip').onclick=()=>$('labPanel').classList.toggle('open');
+$('labX').onclick=()=>$('labPanel').classList.remove('open');
+document.querySelectorAll('[data-lt]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-lt]').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('[data-ls]').forEach(s=>s.classList.toggle('on',s.dataset.ls===b.dataset.lt));});
+$('labStopBtn').onclick=()=>{labStop();if(REC.on)recStop();};
+addEventListener('keydown',e=>{if((e.key==='x'||e.key==='X')&&LAB.src&&!/INPUT|SELECT|TEXTAREA/.test((e.target&&e.target.tagName)||''))labStop();},true);
+handStop();
+
+window.__nitro={LAB,RACE,REC,RUNS:()=>RUNS,PATH,G,car,ball,LINK,linkLine,lpMode,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB,startTour,endTour,tourStep,startAssembly,ASM};
 </script>
