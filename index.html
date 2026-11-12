@@ -359,7 +359,7 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
     <button class="chip shadow" data-open="atelier" style="--c:var(--violet)"><i></i><span class="lbl">Atelier</span></button>
     <button class="chip shadow" id="tourChip" style="--c:var(--orange)" title="Mode présentation (touche P)"><i></i><span class="lbl">Présenter</span></button>
     <button class="chip shadow" id="realChip" style="--c:var(--green)" title="Relier la vraie voiture (manette en USB)"><i></i><span class="lbl">Vraie voiture</span></button>
-    <button class="chip shadow" id="labChip" style="--c:var(--violet)" title="Labo : voix, main, fantôme, tracé, course"><i></i><span class="lbl">Labo</span></button>
+    <button class="chip shadow" id="labChip" style="--c:var(--violet)" title="Labo : stop vocal, main, fantôme, tracé, course"><i></i><span class="lbl">Labo</span></button>
     <button class="chip icon shadow" id="sndBtn" aria-label="Couper le son">🔊</button>
   </nav>
 </div>
@@ -381,7 +381,7 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
 <div class="labpanel shadow" id="labPanel" role="region" aria-label="Labo de pilotage">
   <div class="lp-h"><b>Labo · nouveaux pilotages</b><button id="labX" aria-label="Fermer">✕</button></div>
   <div class="lab-tabs" role="tablist">
-    <button data-lt="voice" class="on"><span>🎙️</span>Voix</button>
+    <button data-lt="voice" class="on"><span>🎙️</span>Stop</button>
     <button data-lt="hand"><span>✋</span>Main</button>
     <button data-lt="ghost"><span>👻</span>Fantôme</button>
     <button data-lt="path"><span>✏️</span>Tracé</button>
@@ -389,12 +389,12 @@ body.touring .lcdbox,body.touring .boostbox,body.touring .touch,body.touring .pa
   </div>
 
   <section class="lab-sec on" data-ls="voice">
-    <h4>Pilotage à la voix</h4>
-    <p>Parlez en français, la voiture obéit. Chrome ou Edge, micro autorisé.</p>
-    <button class="btn" id="vcBtn">🎙️ Activer la voix</button>
+    <h4>Stop vocal</h4>
+    <p>Conduisez avec le site ou avec les vrais joysticks. Dites <b>« stop »</b> : la voiture s'arrête tout de suite. Elle repart quand vous relâchez puis reprenez les commandes. Chrome ou Edge, micro autorisé.</p>
+    <button class="btn" id="vcBtn">🎙️ Activer le stop vocal</button>
     <div class="lab-big" id="vcCmd">–</div>
     <div class="lab-st" id="vcHeard">Entendu : –</div>
-    <div class="lab-cmds"><b>avance</b><b>recule</b><b>gauche</b><b>droite</b><b>tout droit</b><b>plus vite</b><b>doucement</b><b>demi-tour</b><b>klaxon</b><b>stop</b></div>
+    <div class="lab-cmds"><b>stop</b><b>arrête</b><b>halte</b><b>freine</b></div>
   </section>
 
   <section class="lab-sec" data-ls="hand">
@@ -914,6 +914,7 @@ function step(now){
     let d=want-car.h;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;str=Math.max(-1,Math.min(1,d*1.6));thr=.75;bst=false;
   }
   if(LINK.mode==='mirror'&&LINK.fresh()){thr=LINK.t;str=LINK.s;bst=false;}
+  if(vstopHold(now)){thr=0;bst=false;}
   if(!playing&&G.mode==='play'){thr=0;str=0;bst=false;}
   if(!G.cut&&now-lastSend>50){lastSend=now;car.cmdT=thr;car.cmdS=str;car.cmdB=bst;G.lastPacket=now;}
   const silent=now-(G.lastPacket||now);
@@ -1368,7 +1369,7 @@ function linkLine(line){
   const a=parseInt(p[1],10),v=parseInt(p[2],10);if(isNaN(a)||isNaN(v))return;
   LINK.ang=a;LINK.pwm=v;LINK.src=p[3].trim();if(!LINK.last||performance.now()-LINK.last>1000)lpSet(true,'Manette connectée');LINK.last=performance.now();
   LINK.s=Math.max(-1,Math.min(1,(90-a)/45));LINK.t=Math.max(-1,Math.min(1,v/255));
-  $('lpA').textContent=a+'°';$('lpV').textContent=v;$('lpS').textContent=LINK.src==='W'?'site':'manette';
+  $('lpA').textContent=a+'°';$('lpV').textContent=v;$('lpS').textContent=LINK.src==='W'?'site':LINK.src==='V'?'stop vocal':'manette';
   $('lpWarn').classList.toggle('show',LINK.mode==='pilot'&&LINK.src==='M'&&(a!==90||v!==0));
 }
 async function linkConnect(){
@@ -1409,7 +1410,7 @@ function linkStop(){if(LINK.mode!=='off'){lpMode('off');toast('STOP : la vraie v
 setInterval(()=>{
   if(!LINK.writer||LINK.mode!=='pilot'||LINK.busy)return;
   let a=90,v=0;
-  if(G.mode==='play'&&!sheetOpen&&!G.frozen&&!document.hidden){
+  if(G.mode==='play'&&!sheetOpen&&!G.frozen&&!document.hidden&&!VSTOP.active){
     const max=Math.max(70,Math.round(255*$('lpMax').value/100)),t=car.inT,sx=car.inS;
     a=Math.round(90-sx*45);v=t===0?0:Math.sign(t)*Math.round(70+(max-70)*Math.min(1,Math.abs(t)));
   }
@@ -1445,7 +1446,7 @@ function labEnsurePlay(){
 function labStart(src){if(LAB.src&&LAB.src!==src)labStop(true);LAB.src=src;LAB.t=0;LAB.s=0;}
 function labStop(quiet){
   const was=LAB.src;LAB.src=null;LAB.t=0;LAB.s=0;car.inT=0;car.inS=0;readKeys();
-  if(was==='voice')voiceStop();if(was==='hand')handStop();
+  if(was==='hand')handStop();
   if(was==='replay'){REP.run=null;labLine('rep',null);renderRuns();}
   if(was==='path'){PATH.pts=[];labLine('path',null);$('pathSt').textContent='Trajet arrêté';}
   if(!quiet&&was)toast('Labo : arrêt');
@@ -1456,8 +1457,7 @@ function labTick(dt,now){
   if(REC.on&&run)recTick(now);
   if(RACE.on)raceTick(dt,now,run);
   if(!LAB.src)return;
-  if(LAB.src==='voice')voiceTick(now);
-  else if(LAB.src==='replay'&&run)replayTick(dt);
+  if(LAB.src==='replay'&&run)replayTick(dt);
   else if(LAB.src==='path'&&run)pathTick(dt);
   if(!drivingKeys()){car.inT=run?LAB.t:0;car.inS=run?LAB.s:0;}
 }
@@ -1472,64 +1472,44 @@ function labLine(id,pts,col){
   LINES[id]=new THREE.Line(g,new THREE.LineBasicMaterial({color:col||0x7a5cff,linewidth:3}));scene.add(LINES[id]);
 }
 
-/* ---------------- 1. VOIX ---------------- */
-const VOICE={rec:null,on:false,sUntil:0,done:new Set()};
-const V_CMDS=[
-  ['stop',/\b(stop|stoppe|stopper|arrete|arreter|arret|halte|freine|pause)\b/g,'⏹ STOP'],
-  ['recule',/\b(recule|reculer|reculez|arriere)\b/g,'⬇️ RECULE'],
-  ['vite',/\b(vite|turbo|fonce|a fond|accelere)\b/g,'⏩ PLUS VITE'],
-  ['doux',/\b(doucement|lentement|ralenti|ralentis|moins vite)\b/g,'🐢 DOUCEMENT'],
-  ['avance',/\b(avance|avancer|avancez|en avant|go|vas y|allez|demarre|roule)\b/g,'⬆️ AVANCE'],
-  ['centre',/\b(tout droit|centre|droit devant)\b/g,'⬆️ TOUT DROIT'],
-  ['gauche',/\bgauche\b/g,'⬅️ GAUCHE'],
-  ['droite',/\bdroite\b/g,'➡️ DROITE'],
-  ['demi',/\bdemi tour\b/g,'↩️ DEMI-TOUR'],
-  ['klaxon',/\b(klaxon|klaxonne|pouet)\b/g,'📯 KLAXON']];
+/* ---------------- 1. STOP VOCAL ----------------
+   On dit « stop » : la voiture s'arrête, qu'elle soit conduite par le site
+   (clavier, Labo) ou par les vrais joysticks (la manette reçoit "X" par USB).
+   L'arrêt reste actif tant qu'on n'a pas relâché les commandes. */
+const VOICE={rec:null,on:false,done:new Set()};
+const VSTOP={active:false,since:0};
+const STOP_RE=/\b(stop|stoppe|stopper|stoppez|arrete|arreter|arretez|arret|halte|freine|top)\b/g;
 function vNorm(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[-'’.,!?]/g,' ').replace(/\s+/g,' ');}
-function vLast(txt){let best=null;
-  for(const [name,re,label] of V_CMDS){re.lastIndex=0;let m;while((m=re.exec(txt))){const end=m.index+m[0].length;
-    if(!best||end>best.end||(end===best.end&&m[0].length>best.len))best={name,label,end,len:m[0].length,pos:m.index};}}
-  return best;}
-function voiceApply(c){
-  const now=performance.now();
-  switch(c.name){
-    case 'stop':LAB.t=0;LAB.s=0;VOICE.sUntil=0;break;
-    case 'avance':LAB.t=.6;break;
-    case 'recule':LAB.t=-.6;break;
-    case 'vite':LAB.t=LAB.t<0?-1:1;break;
-    case 'doux':LAB.t=LAB.t<0?-.35:.35;break;
-    case 'centre':LAB.s=0;VOICE.sUntil=0;break;
-    case 'gauche':LAB.s=1;VOICE.sUntil=now+1100;break;
-    case 'droite':LAB.s=-1;VOICE.sUntil=now+1100;break;
-    case 'demi':LAB.s=1;VOICE.sUntil=now+3200;if(LAB.t<=0)LAB.t=.5;break;
-    case 'klaxon':sfx.klaxon();break;
-  }
-  $('vcCmd').textContent=c.label;$('vcCmd').animate([{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:250});
+function voiceStopNow(){
+  VSTOP.active=true;VSTOP.since=performance.now();
+  if(LAB.src)labStop(true);car.inT=0;car.inS=0;
+  linkSend('X\n');linkSend('W,90,0\n');
+  sfx.beep(false);toast('⏹ STOP vocal : la voiture s\'arrête');
+  const c=$('vcCmd');c.textContent='⏹ STOP';c.animate([{transform:'scale(1.35)'},{transform:'scale(1)'}],{duration:300});
 }
-function voiceTick(now){if(VOICE.sUntil&&now>VOICE.sUntil){VOICE.sUntil=0;LAB.s=0;}}
+// appelé depuis step() : l'arrêt dure tant que les touches ne sont pas relâchées (0,8 s minimum)
+function vstopHold(now){if(VSTOP.active&&!drivingKeys()&&now-VSTOP.since>800)VSTOP.active=false;return VSTOP.active;}
 function voiceStart(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){$('vcHeard').textContent='Reconnaissance vocale indisponible : utilisez Chrome ou Edge sur ordinateur.';return;}
-  labStart('voice');labEnsurePlay();
   const r=new SR();r.lang='fr-FR';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
   VOICE.rec=r;VOICE.on=true;VOICE.done=new Set();
   r.onresult=e=>{
     for(let i=e.resultIndex;i<e.results.length;i++){
-      const txt=e.results[i][0].transcript;$('vcHeard').textContent='Entendu : « '+txt.trim()+' »';
-      const c=vLast(vNorm(txt));if(!c)continue;
-      const sig=i+':'+c.name+':'+c.pos;if(VOICE.done.has(sig))continue;VOICE.done.add(sig);voiceApply(c);
+      const txt=vNorm(e.results[i][0].transcript);$('vcHeard').textContent='Entendu : « '+e.results[i][0].transcript.trim()+' »';
+      STOP_RE.lastIndex=0;let m;while((m=STOP_RE.exec(txt))){const sig=i+':'+m.index;if(!VOICE.done.has(sig)){VOICE.done.add(sig);voiceStopNow();}}
     }
   };
   r.onerror=e=>{
-    if(e.error==='not-allowed'||e.error==='service-not-allowed'){$('vcHeard').textContent='Micro refusé : autorisez le micro (icône à gauche de l\'adresse).';labStop(true);}
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){$('vcHeard').textContent='Micro refusé : autorisez le micro (icône à gauche de l\'adresse).';voiceStop();}
     else if(e.error==='network'){$('vcHeard').textContent='La reconnaissance vocale de Chrome a besoin d\'Internet.';}
   };
   r.onend=()=>{if(VOICE.on&&VOICE.rec===r){VOICE.done=new Set();setTimeout(()=>{if(VOICE.on&&VOICE.rec===r)try{r.start();}catch(e){}},120);}};
   try{r.start();}catch(e){}
-  $('vcBtn').textContent='🔇 Couper la voix';$('vcHeard').textContent='Je vous écoute… dites « avance »';toast('🎙️ Voix activée : dites « avance »');
+  $('vcBtn').textContent='🔇 Couper l\'écoute';$('vcCmd').textContent='👂 J\'écoute…';$('vcHeard').textContent='Conduisez, puis dites « stop »';toast('🎙️ Stop vocal activé : dites « stop »');
 }
-function voiceStop(){VOICE.on=false;if(VOICE.rec){try{VOICE.rec.abort();}catch(e){}VOICE.rec=null;}$('vcBtn').textContent='🎙️ Activer la voix';$('vcCmd').textContent='–';}
-$('vcBtn').onclick=()=>{if(LAB.src==='voice')labStop();else voiceStart();};
+function voiceStop(){VOICE.on=false;if(VOICE.rec){try{VOICE.rec.abort();}catch(e){}VOICE.rec=null;}$('vcBtn').textContent='🎙️ Activer le stop vocal';$('vcCmd').textContent='–';}
+$('vcBtn').onclick=()=>{if(VOICE.on)voiceStop();else voiceStart();};
 
 /* ---------------- 2. MAIN (IA MediaPipe) ---------------- */
 const HAND={on:false,lm:null,video:null,stream:null,raf:0,lastT:-1,t:0,s:0,seen:0};
@@ -1769,5 +1749,5 @@ $('labStopBtn').onclick=()=>{labStop();if(REC.on)recStop();};
 addEventListener('keydown',e=>{if((e.key==='x'||e.key==='X')&&LAB.src&&!/INPUT|SELECT|TEXTAREA/.test((e.target&&e.target.tagName)||''))labStop();},true);
 handStop();
 
-window.__nitro={LAB,RACE,REC,RUNS:()=>RUNS,PATH,G,car,ball,LINK,linkLine,lpMode,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB,startTour,endTour,tourStep,startAssembly,ASM};
+window.__nitro={LAB,RACE,REC,VSTOP,voiceStopNow,RUNS:()=>RUNS,PATH,G,car,ball,LINK,linkLine,lpMode,scoreGoal,openSheet,closeSheet,kickoff,setJumbo,openLB,startTour,endTour,tourStep,startAssembly,ASM};
 </script>
