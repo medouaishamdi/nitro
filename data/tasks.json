@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-09",
+  "updated": "2026-11-24",
   "tasks": [
     {
       "id": "t01",
@@ -78,25 +78,25 @@
       "id": "t14",
       "part": "Voiture",
       "title": "LED jaunes en clignotants",
-      "status": "todo"
+      "status": "dropped"
     },
     {
       "id": "t15",
       "part": "Voiture",
       "title": "LED rouges allumées en marche arrière",
-      "status": "todo"
+      "status": "dropped"
     },
     {
       "id": "t16",
       "part": "Voiture",
       "title": "Klaxon",
-      "status": "todo"
+      "status": "dropped"
     },
     {
       "id": "t17",
       "part": "Voiture",
       "title": "Coque de la voiture",
-      "status": "todo"
+      "status": "dropped"
     },
     {
       "id": "t18",
@@ -108,7 +108,7 @@
       "id": "t19",
       "part": "Web & données",
       "title": "Base de données : sessions, télémétrie et événements",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "t20",
@@ -120,7 +120,7 @@
       "id": "t21",
       "part": "Web & données",
       "title": "Site web du projet (cette page) relié à la base",
-      "status": "doing",
+      "status": "done",
       "owner": "MH"
     },
     {

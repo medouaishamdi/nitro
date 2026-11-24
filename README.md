@@ -24,16 +24,18 @@ La première carte moteur, une **L298N**, chauffait et perdait de la puissance :
 
 ## Avancement
 
-**Fait (11 / 20 tâches, 55 %)**
+**Fait (13 / 16 tâches, 81 %)**
 - Voiture : ESP32, hacheur DRV8871 pour le moteur, servomoteur de direction, double alimentation 7,4 V / 5 V, code angle + vitesse, la voiture avance et tourne
 - Manette : ESP32 + 2 joysticks, écran DIR | GAZ, conduite progressive à 20 envois/s
 - Liaison directe ESP32 → ESP32 par identifiant unique
+- Base de données SQLite reliée au site (sessions, télémétrie, événements, tours)
 
 **À faire**
-- Marche arrière, LED (clignotants jaunes, feux rouges de recul), klaxon
-- Coque de la voiture ; finir la coque de la manette (imprimée en 3D, en cours)
-- Base de données (sessions, télémétrie, événements) et calcul de la vitesse
-- Relier le site à la base de données
+- Marche arrière
+- Finir la coque de la manette (imprimée en 3D, en cours)
+- Calcul de la vitesse réelle (capteur de rotation de roue)
+
+**Retiré** : LED, klaxon et coque de la voiture (choix de l'équipe), capteur de température
 
 ## Le site : NITRO Arena
 
@@ -48,18 +50,21 @@ Le projet présenté sous forme de jeu de football 3D dans le navigateur (Three.
 - **QR code** sur l'écran géant (et dans la présentation) pour ouvrir le site sur téléphone ;
 - la liste des tâches s'enregistre automatiquement : rien n'est perdu en fermant la page.
 
-Base de données proposée pour l'évaluation finale :
+### Base de données (bouton « Données »)
 
-```
-sessions    (id, date, pilote, duree_s)
-telemetrie  (session_id, t_ms, vitesse_pct, angle_deg, batterie_v)
-evenements  (session_id, t_ms, type)   -- klaxon, clignotant, recul, but
-```
+Une vraie base **SQLite** tourne dans le navigateur (sql.js, WebAssembly, dossier `vendor/`) et se sauvegarde toute seule (IndexedDB) :
+
+- **Enregistrement automatique** : dès qu'on conduit (vraie voiture via la manette USB, ou voiture 3D au clavier), une session démarre ; 10 mesures par seconde ; fin après 8 s sans commande.
+- **Tables** : `pilotes`, `sessions`, `telemetrie` (angle, vitesse PWM, qui conduit), `evenements` (connexion, perte de liaison, stop vocal, marche arrière, buts, klaxon, tours), `tours` (course du Labo).
+- **Vues** `v_sessions` et `v_classement`, **trigger** qui calcule la durée, clés étrangères avec suppression en cascade.
+- **Interface** : tableau de bord avec courbes, liste des sessions, console SQL avec requêtes d'exemple, schéma relationnel, export `.sqlite` (DB Browser for SQLite) et CSV, import, remise à zéro.
 
 ## Contenu du dépôt
 
 ```
-index.html            le site (un seul fichier, Three.js chargé depuis cdnjs)
+index.html            le site (Three.js chargé depuis cdnjs)
+db.js                 la base de données SQLite (enregistrement, tableau de bord, SQL)
+vendor/               sql.js (SQLite en WebAssembly)
 data/tasks.json       la liste des tâches affichée par le site
 media/                photos et vidéos du prototype
 presentation/         la présentation (PowerPoint avec transitions Morph, et PDF)
