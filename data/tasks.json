@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-24",
+  "updated": "2026-11-24T15:30",
   "tasks": [
     {
       "id": "t01",
@@ -71,7 +71,7 @@
       "id": "t13",
       "part": "Voiture",
       "title": "Marche arrière",
-      "status": "todo",
+      "status": "done",
       "owner": "AE"
     },
     {
@@ -114,7 +114,7 @@
       "id": "t20",
       "part": "Web & données",
       "title": "Calcul de la vitesse et envoi dans la base",
-      "status": "todo"
+      "status": "dropped"
     },
     {
       "id": "t21",

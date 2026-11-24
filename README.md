@@ -24,18 +24,16 @@ La première carte moteur, une **L298N**, chauffait et perdait de la puissance :
 
 ## Avancement
 
-**Fait (13 / 16 tâches, 81 %)**
-- Voiture : ESP32, hacheur DRV8871 pour le moteur, servomoteur de direction, double alimentation 7,4 V / 5 V, code angle + vitesse, la voiture avance et tourne
+**Fait (14 / 15 tâches, 93 %)**
+- Voiture : ESP32, hacheur DRV8871 pour le moteur, servomoteur de direction, double alimentation 7,4 V / 5 V, code angle + vitesse, la voiture avance, recule et tourne
 - Manette : ESP32 + 2 joysticks, écran DIR | GAZ, conduite progressive à 20 envois/s
 - Liaison directe ESP32 → ESP32 par identifiant unique
 - Base de données SQLite reliée au site (sessions, télémétrie, événements, tours)
 
 **À faire**
-- Marche arrière
 - Finir la coque de la manette (imprimée en 3D, en cours)
-- Calcul de la vitesse réelle (capteur de rotation de roue)
 
-**Retiré** : LED, klaxon et coque de la voiture (choix de l'équipe), capteur de température
+**Retiré** : LED, klaxon, coque de la voiture et calcul de la vitesse réelle (choix de l'équipe), capteur de température
 
 ## Le site : NITRO Arena
 
