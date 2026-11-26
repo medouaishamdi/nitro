@@ -1370,7 +1370,7 @@ function lpMode(m){
 function linkLine(line){
   if(!line.startsWith('N,'))return;const p=line.split(',');if(p.length<4)return;
   const a=parseInt(p[1],10),v=parseInt(p[2],10);if(isNaN(a)||isNaN(v))return;
-  LINK.ang=a;LINK.pwm=v;LINK.src=p[3].trim();if(!LINK.last||performance.now()-LINK.last>1000)lpSet(true,'Manette connectée');LINK.last=performance.now();
+  LINK.ang=a;LINK.pwm=v;LINK.src=p[3].trim();if(!LINK.last||performance.now()-LINK.last>1000){lpSet(true,'Manette connectée · données reçues');if(LINK.note0)$('lpNote').textContent=LINK.note0;}LINK.last=performance.now();
   LINK.s=Math.max(-1,Math.min(1,(90-a)/45));LINK.t=Math.max(-1,Math.min(1,v/255));
   $('lpA').textContent=a+'°';$('lpV').textContent=v;$('lpS').textContent=LINK.src==='W'?'site':LINK.src==='V'?'stop vocal':'manette';
   $('lpWarn').classList.toggle('show',LINK.mode==='pilot'&&LINK.src==='M'&&(a!==90||v!==0));
@@ -1381,7 +1381,7 @@ async function linkConnect(){
   let port;try{port=await navigator.serial.requestPort();}catch(e){return;}
   try{await port.open({baudRate:115200,bufferSize:4096});}catch(e){toast('Impossible d\'ouvrir le port : fermez Arduino IDE (Moniteur série).');return;}
   try{await port.setSignals({dataTerminalReady:false,requestToSend:false});}catch(e){}
-  LINK.port=port;LINK.closing=false;lpSet(true,'Manette connectée, en attente des données…');
+  LINK.port=port;LINK.closing=false;lpSet(true,'Manette connectée, en attente des données…');LINK.last=0;LINK.note0=LINK.note0||$('lpNote').textContent;setTimeout(()=>{if(LINK.port===port&&!LINK.last){lpSet(true,'Port ouvert mais aucune donnée');$('lpNote').textContent='La manette ne parle pas au site : téléversez manette_nitro_web.ino sur la manette (pas manette_nitro.ino), fermez le Moniteur série d\'Arduino IDE, puis reconnectez.';}},3000);
   try{LINK.writer=port.writable.getWriter();}catch(e){LINK.writer=null;}
   LINK.enc=new TextEncoder();
   (async()=>{
